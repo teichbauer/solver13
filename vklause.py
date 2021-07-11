@@ -65,7 +65,7 @@ class VKlause:
             for b in sbits:
                 ind = 2 - ref_bits.index(b)  # b == 6, ind: 1; b==16, ind = 2
                 vlst.append((ind, self.dic[b]))
-                set_bit(v, ind, self.dic[b])
+                # set_bit(v, ind, self.dic[b])
 
             for cv in range(8):
                 vb_hit = True
@@ -75,6 +75,7 @@ class VKlause:
                     cvs.append(cv)
             return cvs
         else:
+            v = 0
             bs = list(reversed(self.bits))  # ascending: as in [0,4,6]
             for pos, bit in enumerate(bs):
                 v = set_bit(v, pos, self.dic[bit])

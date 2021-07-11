@@ -1,3 +1,7 @@
+2021-07-10->0.222
+- new BitGrid class
+- vkmgr.morph now uses snode.bitgrid
+- satholder.reduce_vk replaced by snode.bitgrid
 2021-07-06->0.221
 - solver13 branched off from solver12
 2021-06-25->0.220

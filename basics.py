@@ -1,4 +1,3 @@
-
 def verify_sat(vkdic, sat):
     for vk in vkdic.values():
         if vk.hit(sat):
@@ -8,7 +7,7 @@ def verify_sat(vkdic, sat):
 
 def nov_val(msg):  # '12.4' -> 12, 4
     lst = []
-    for m in msg.split('.'):
+    for m in msg.split("."):
         lst.append(int(m))
     return lst
 
@@ -18,14 +17,15 @@ def get_bit(val, bit):
 
 
 def set_bit(val, bit_index, new_bit_value):
-    """ Set the bit_index (0-based) bit of val to x (1 or 0)
-        and return the new val. the input param val remains unmodified.
-        """
+    """Set the bit_index (0-based) bit of val to x (1 or 0)
+    and return the new val.
+    the input param val remains unmodified, for val is passed-in by-value !
+    """
     mask = 1 << bit_index  # mask - integer with just the chosen bit set.
-    val &= ~mask           # Clear the bit indicated by the mask (if x == 0)
+    val &= ~mask  # Clear the bit indicated by the mask (if x == 0)
     if new_bit_value:
-        val |= mask        # If x was True, set the bit indicated by the mask.
-    return val             # Return the result, we're done.
+        val |= mask  # If x was True, set the bit indicated by the mask.
+    return val  # Return the result, we're done.
 
 
 def set_bits(val, d):
@@ -39,43 +39,40 @@ def oppo_binary(binary_value):
 
 
 def get_sdic(filename):
-    path = './configs/' + filename
+    path = "./configs/" + filename
     sdic = eval(open(path).read())
     return sdic
 
 
 def ordered_dic_string(d):
     v2cnt = 0
-    m = '{ '
+    m = "{ "
     ks = sorted(d.keys(), reverse=True)
     for k in ks:
         if d[k] == 2:
             v2cnt += 1
-        m += str(k) + ': ' + str(d[k]) + ', '
-    m = m.strip(', ')
-    m += ' }'
+        m += str(k) + ": " + str(d[k]) + ", "
+    m = m.strip(", ")
+    m += " }"
     return m, v2cnt
 
 
 def print_json(nov, vkdic, fname):
-    sdic = {
-        'nov': nov,
-        'kdic': {}
-    }
+    sdic = {"nov": nov, "kdic": {}}
     for kn, vk in vkdic.items():
-        sdic['kdic'][kn] = vk.dic
-    ks = sorted(list(sdic['kdic'].keys()))
+        sdic["kdic"][kn] = vk.dic
+    ks = sorted(list(sdic["kdic"].keys()))
 
-    with open(fname, 'w') as f:
-        f.write('{\n')
-        f.write('    "nov": ' + str(sdic['nov']) + ',\n')
+    with open(fname, "w") as f:
+        f.write("{\n")
+        f.write('    "nov": ' + str(sdic["nov"]) + ",\n")
         f.write('    "kdic": {\n')
         # for k, d in sdic['kdic'].items():
         for k in ks:
-            msg = ordered_dic_string(sdic['kdic'][k])
+            msg = ordered_dic_string(sdic["kdic"][k])
             line = f'        "{k}": {msg},'
-            f.write(f'{line}\n')
-        f.write('    }\n}')
+            f.write(f"{line}\n")
+        f.write("    }\n}")
 
 
 def topvalue(vk):
@@ -95,8 +92,7 @@ def topbits(nov, nob):
 
 
 def vkdic_remove(vkdic, kns):
-    ''' remove vk from vkdic, if vk.kname is in kns(a list)
-        '''
+    """remove vk from vkdic, if vk.kname is in kns(a list)"""
     kd = {}
     for kn, vk in vkdic.items():
         if kn not in kns:
@@ -111,5 +107,5 @@ def display_vkdic(vkd, title=None):
     kns.sort()
     for kn in kns:
         vk = vkd[kn]
-        print(f'{kn}: ' + ordered_dic_string(vk.dic))
-    print('-------------')
+        print(f"{kn}: " + ordered_dic_string(vk.dic))
+    print("-------------")

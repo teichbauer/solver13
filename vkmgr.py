@@ -39,20 +39,18 @@ class VKManager:
             if vk.kname in snode.vk12dic:
                 vk12 = snode.vk12dic
             else:
-                vk12, vk3, cvr = snode.sh.reduce_vk(vk)
-                if vk3:
-                    vk3dic[kn] = vk3
-                elif vk12:
-                    vk12.cvr = cvr
-                    snode.vk12dic[vk12.kname] = vk12
-                else:
-                    excl_cvs.add(cvr)
-            if vk12:
-                tdic.setdefault(tuple(vk12.cvr), []).append(vk12)
+                cvs, rvk = snode.bitgrid.cvs_and_outdic(vk)
+                if rvk and rvk.nob < 3:
+                    x = 1
+                if rvk and rvk.nob == 3:  # vk lies totally outside of 3-bits
+                    vk3dic[kn] = rvk
+                elif rvk == None:  # vk has all 3-bits. cvs is a single value
+                    excl_cvs.add(cvs)
+                else:  # vk covers 1 or 2 bits from bits. cvs is a list
+                    tdic.setdefault(tuple(cvs), []).append(vk12)
+                    # rvk.cvr = cvs  # [list of covered values]
+                    snode.vk12dic[rvk.kname] = rvk  # rvk is vk12
 
-        # if len(tdic) == 0:
-        #     return None, None
-        # 2**3 == 8 - number of possible children of the satnoe,
         for val in range(8):
             if val in excl_cvs:
                 continue
@@ -133,7 +131,6 @@ class VKManager:
             "ancs": tuple(sorted(list(best_choice[0]))),
             "touched": best_choice[1],
             "bits": best_bits,
-            "bit_set": set(best_bits),
         }
         return result
 

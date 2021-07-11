@@ -3,6 +3,7 @@ from vk12mgr import VK12Manager
 from basics import get_bit
 from satholder import SatHolder
 from pathmgr import PathManager
+from bitgrid import BitGrid
 from center import Center
 
 
@@ -21,6 +22,7 @@ class SatNode:
 
     def prepare(self):
         self.choice = self.vkm.choose_anchor()
+        self.bitgrid = BitGrid(self.choice["bits"])
         self.make_skeleton()
         self.next_sh = self.sh.reduce(self.choice["bits"])
 
@@ -34,9 +36,7 @@ class SatNode:
         Center.snodes[self.nov] = self
         if self.done:
             for nov, sn in Center.snodes.items():
-                for cv, ctn in sn.chdic.items():
-                    sn.set_topdowns(ctn)
-            x = 1
+                pass
 
     # end of def prepare(self):
 
@@ -51,14 +51,16 @@ class SatNode:
                 for indx, b in enumerate(self.choice["bits"]):
                     hsat[b] = get_bit(v, 2 - indx)
 
-    def set_topdowns(self, tnode):
+    def set_topdowns(self, tnode, bits):
         td_dic = Center.topdowns.setdefault(self.nov, {})
         novs = sorted(Center.skeleton.keys(), reverse=True)
         ind = novs.index(self.nov)
         for nov in novs[ind + 1 :]:
             tname = f"{nov}."
-            bset = Center.snodes[nov].choice['bit_set']
+            # bset = Center.snodes[nov].choice['bit_set']
             for vk in tnode.vkm.vkdic.values():
+                lst = bits[:]  # [25,7,1]
+                vk.compressed_value(lst)
                 ss = bset.intersection(vk.bits)
                 if len(ss) > 0:
                     if set(vk.bits) == ss:
