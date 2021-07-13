@@ -26,7 +26,8 @@ def process(cnfname):
     sh = SatHolder(satslots)
     Center.maxnov = sh.ln
 
-    sn = SatNode(None, sh, vkm)
+    choice = vkm.choose_anchor()
+    sn = SatNode(None, sh, vkm, choice)
     while not sn.done:
         # print(f'spawning at nov = {sn.nov}')
         sn = sn.spawn()
@@ -36,8 +37,8 @@ def process(cnfname):
 def get_vkdic_from_cfg(cfgfile):
     sdic = get_sdic(cfgfile)
 
-    vkdic = make_vkdic(sdic['kdic'], sdic['nov'])
-    return vkdic, sdic['nov']
+    vkdic = make_vkdic(sdic["kdic"], sdic["nov"])
+    return vkdic, sdic["nov"]
 
 
 def work(configfilename, verify=True):
@@ -46,27 +47,27 @@ def work(configfilename, verify=True):
     now_time = time.time()
     time_used = now_time - start_time
     ln = len(sats)
-    print(f'there are {ln} sats:')
+    print(f"there are {ln} sats:")
 
     vkdic, dummy = get_vkdic_from_cfg(configfilename)
 
     for ind, sat in enumerate(sats):
         msg, cnt2 = ordered_dic_string(sat)
         if cnt2 > 0:
-            m = f'{ind+1}({2**cnt2}):'
+            m = f"{ind+1}({2**cnt2}):"
         else:
-            m = f'{ind+1}:'
+            m = f"{ind+1}:"
         m += msg
         if verify:
             verified = verify_sat(vkdic, sat)
-            m += f', verified: {verified}'
+            m += f", verified: {verified}"
         print(m)
-    print(f'Time used: {time_used}')
+    print(f"Time used: {time_used}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # configfilename = 'cfg100-450.json'
-    configfilename = 'cfg60-266.json'
+    configfilename = "cfg60-266.json"
     # configfilename = 'cfg60-280.json'
     # configfilename = 'cfg60-262.json'
     # configfilename = 'config1.json'

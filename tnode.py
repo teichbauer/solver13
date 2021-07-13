@@ -4,12 +4,11 @@ from center import Center
 
 
 class TNode:
-
     def __init__(self, vk12dic, holder_snode, val):
         self.val = val
         self.holder = holder_snode
         self.sh = holder_snode.next_sh
-        self.name = f'{self.holder.nov}.{val}'
+        self.name = f"{self.holder.nov}.{val}"
         self.hsat = holder_snode.sh.get_sats(val)
         self.vkm = VK12Manager(self.sh.ln, vk12dic)
 
@@ -22,6 +21,14 @@ class TNode:
             elif vk12:
                 vk12dic[kn] = vk12
         return vk12dic
+
+    def approve(self, grid):
+        """for the grid of next(lower) level snode, do
+        1.
+        """
+        vkmdic = {}
+        for kn, vk in self.vkm.vkdic.items():
+            cvs, vk12 = grid.cvs_and_outdic(vk)
 
     def find_path_vk12m(self, pnode_leftover_vk12dic):
         vk12m = self.vkm.clone()  # use a clone, don't touch self.vkm.vks
@@ -55,22 +62,3 @@ class TNode:
                 pname.insert(0, self.name)
                 pathdic[tuple(pname)] = pvkm
         return pathdic
-
-    # def add_ancvks(self, vkm):
-    #     vk1s = self.vkm.vk1s()  # get all vk1 from vkm
-    #     if len(vk1s) > 0:
-    #         for nv, vks in Center.anchor_vks.items():
-    #             if nv < self.holder.nov:
-    #                 # for anc-vks(all vk3s) of the lower snodes:
-    #                 # if any vk1 in vkm can make a anc-vk vk2
-    #                 # then add this new vk2 to vkm
-    #                 # ----------------------------------------------
-    #                 for vk in vks:
-    #                     for vk1 in vk1s:
-    #                         b = vk1.bits[0]
-    #                         # this vk1-bit in vk, and vk[b] has diff value
-    #                         # in that case vk becomes vk2. Add this new vk2
-    #                         if b in vk.bits and vk.dic[b] != vk1.dic[b]:
-    #                             vk2 = vk.clone(vk1.bits)
-    #                             vkm.add_vk(vk2)
-    #     return vkm.valid

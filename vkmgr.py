@@ -29,30 +29,29 @@ class VKManager:
 
     def morph(self, snode):
         chs = {}  # {<cvr-val>: {kn, ..},..}
-        excl_cvs = set([])
-        kns = list(self.vkdic.keys())
         vk3dic = {}
-
         tdic = {}
-        for kn in kns:
-            vk = self.vkdic[kn]
+        vkm3 = None
+        snode.next_choice = None
+
+        for vk in self.vkdic.values():
             if vk.kname in snode.vk12dic:
                 vk12 = snode.vk12dic
             else:
                 cvs, rvk = snode.bitgrid.cvs_and_outdic(vk)
-                if rvk and rvk.nob < 3:
-                    x = 1
-                if rvk and rvk.nob == 3:  # vk lies totally outside of 3-bits
-                    vk3dic[kn] = rvk
-                elif rvk == None:  # vk has all 3-bits. cvs is a single value
-                    excl_cvs.add(cvs)
-                else:  # vk covers 1 or 2 bits from bits. cvs is a list
-                    tdic.setdefault(tuple(cvs), []).append(vk12)
-                    # rvk.cvr = cvs  # [list of covered values]
-                    snode.vk12dic[rvk.kname] = rvk  # rvk is vk12
+                if rvk:
+                    if rvk.nob == 3:  # vk lies totally outside of 3-bits
+                        vk3dic[kn] = rvk
+                    else:  # vk covers 1 or 2 bits from bits. cvs is a list
+                        tdic.setdefault(tuple(cvs), []).append(vk12)
+                        snode.vk12dic[rvk.kname] = rvk  # rvk is vk12
+
+        if len(vk3dic) > 0:
+            vkm3 = VKManager(vk3dic, self.nov - 3, True)
+            snode.next_choice = vkm3.choose_anchor()
 
         for val in range(8):
-            if val in excl_cvs:
+            if val in snode.bitgrid.covers:
                 continue
             sub_vk12dic = {}
             for cvr in tdic:
@@ -65,13 +64,10 @@ class VKManager:
             if tnode.vkm.valid:
                 Center.repo[tnode.name] = tnode
                 chs[val] = tnode
-        if len(vk3dic) == 0:
-            return None, chs
-        else:
-            # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
-            self.make_bdic()  # make bdic to be used for .next/choose_anchor
-            # for making chdic with tnodes
-            return VKManager(vk3dic, self.nov - 3, True), chs
+        # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
+        self.make_bdic()  # make bdic to be used for .next/choose_anchor
+        # for making chdic with tnodes
+        return vkm3, chs
 
     # enf of def morph()
 
@@ -128,7 +124,7 @@ class VKManager:
                     max_tcleng = ltcvk
                     best_bits = bits
         result = {
-            "ancs": tuple(sorted(list(best_choice[0]))),
+            "ancvks": [self.vkdic[kn] for kn in best_choice[0]],
             "touched": best_choice[1],
             "bits": best_bits,
         }

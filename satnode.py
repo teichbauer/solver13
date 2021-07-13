@@ -11,40 +11,51 @@ class SatNode:
     debug = False
     # debug = True
 
-    def __init__(self, parent, sh, vkm):
+    def __init__(self, parent, sh, vkm, choice):
         self.parent = parent
         self.sh = sh
         self.vkm = vkm
         self.nov = vkm.nov
         self.next = None
         self.done = False
+        self.choice = choice
+        self.bitgrid = BitGrid(self.choice)
         self.prepare()
+        Center.snodes[self.nov] = self
 
     def prepare(self):
-        self.choice = self.vkm.choose_anchor()
-        self.bitgrid = BitGrid(self.choice["bits"])
         self.make_skeleton()
-        self.next_sh = self.sh.reduce(self.choice["bits"])
-
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
-        self.tx_vkm, self.chdic = self.vkm.morph(self)  # tx_vkm: all vk3s
+        self.next_sh = self.sh.reduce(self.choice["bits"])
+        self.next_vkm, self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
+        self.done = (self.next_vkm == None) or len(self.next_vkm.vkdic) == 0
 
-        self.done = (self.tx_vkm == None) or len(self.tx_vkm.vkdic) == 0
         if self.debug:
             ks = [f"{self.nov}.{k}" for k in self.chdic.keys()]
             print(f"keys: {ks}")
-        Center.snodes[self.nov] = self
         if self.done:
             for nov, sn in Center.snodes.items():
                 pass
 
     # end of def prepare(self):
 
+    def spawn(self):
+        # print(f'snode-nov{self.nov}')
+        # after morph, vkm.vkdic only have vk3s left, if any
+        if len(self.chdic) == 0:
+            self.done = True
+            return None
+        else:
+            self.next = SatNode(
+                self, self.next_sh.clone(), self.next_vkm, self.next_choice
+            )
+            return self.next
+
     def make_skeleton(self):
         thsats = Center.skeleton.setdefault(self.nov, {})
         cvrs = []
-        for bvkn in self.choice["ancs"]:
-            cvrs.append(self.vkm.vkdic[bvkn].compressed_value())
+        for bvk in self.choice["ancvks"]:
+            cvrs.append(bvk.compressed_value())
         for v in range(8):
             if v not in cvrs:
                 hsat = thsats.setdefault(v, {})
@@ -89,16 +100,6 @@ class SatNode:
                             break
                 if add_it:
                     td_dic[v] = td_vkm
-
-    def spawn(self):
-        # print(f'snode-nov{self.nov}')
-        # after morph, vkm.vkdic only have vk3s left, if any
-        if len(self.chdic) == 0:
-            self.done = True
-            return None
-        else:
-            self.next = SatNode(self, self.next_sh.clone(), self.tx_vkm)
-            return self.next
 
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode

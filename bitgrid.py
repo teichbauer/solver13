@@ -3,9 +3,10 @@ from vklause import VKlause
 
 
 class BitGrid:
-    def __init__(self, grid_bits):
+    def __init__(self, choice):  # grid_bits):
         # grid-bits: high -> low, descending order
-        self.grids = list(reversed(grid_bits))  # bits
+        self.grids = list(reversed(choice["bits"]))  # bits
+        self.covers = [vk.compressed_value() for vk in choice["ancvks"]]
 
     def vary_1bit(self, val, bits, cvs=None):
         if cvs == None:
@@ -25,6 +26,11 @@ class BitGrid:
     def cvs_and_outdic(self, vk):
         g = [2, 1, 0]
         cvs = None
+        # vk's dic values within self.grid-bits, forming a value in (0..7)
+        # example: grids: (16,6,1), vk.dic:{29:0, 16:1, 1:0} has
+        # {16:1,1:0} iwithin grid-bits, forming a value of 4/1*0 where
+        # * is the variable value taking 0/1 - that will be set by
+        # self.vary_1bit call, but for to begin, set v to be 4/100
         v = 0
         out_dic = {}
         for b in vk.dic:
@@ -40,7 +46,9 @@ class BitGrid:
 
         ovk = VKlause(vk.kname, out_dic, vk.nov)
         if len(out_dic) < 3:
+            # get values of all possible settings of untouched bits in g
             cvs = self.vary_1bit(v, g)
             cvs.sort()
-
+        # else: # in case of len(out_dic) == 3
+        # cvs remains None, ovk is a vk3 (untouched by grid-bits)
         return cvs, ovk
