@@ -41,8 +41,11 @@ class BitGrid:
             else:
                 out_dic[b] = vk.dic[b]
         if len(out_dic) == 0:  # vk covers all 3 bits
-            # return vk's compressed-value(not a list), and None
-            return vk.compressed_value(), None
+            # return vk's compressed-value(single value), and None
+            if vk.nob == 3:
+                return vk.compressed_value(), None
+            else:
+                cvs = self.vary_1bit(v, g)  # TB verified
 
         ovk = VKlause(vk.kname, out_dic, vk.nov)
         if len(out_dic) < 3:

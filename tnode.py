@@ -22,13 +22,32 @@ class TNode:
                 vk12dic[kn] = vk12
         return vk12dic
 
-    def approve(self, grid):
+    def approve(self, lwr_snode):  # next/lower snode, with its bitgrid
+        # grid is bitgrid of next(lower snode)
         """for the grid of next(lower) level snode, do
         1.
         """
+        grid = lwr_snode.bitgrid
         vkmdic = {}
+        for k in range(8):  # setup possible vk12ms
+            if k not in grid.covers:
+                vkmdic[k] = VK12Manager(self.vkm.nov)
+
         for kn, vk in self.vkm.vkdic.items():
             cvs, vk12 = grid.cvs_and_outdic(vk)
+            if cvs == None:  # vk12 didn't touch grid
+                # add vk12 to every vkms
+                for vk12m in vkmdic.values():
+                    vk12m.add(vk12)
+            elif vk12 == None:  # vk is totally covered by grid.
+                # cvs: list of values that are hit by vk
+                for cv in cvs:
+                    del vkmdic[cv]
+            else:  # vk is partially hit by grid
+                for cv in cvs:
+                    if cv in vkmdic:
+                        vkmdic[cv].add(vk12)
+        return vkmdic
 
     def find_path_vk12m(self, pnode_leftover_vk12dic):
         vk12m = self.vkm.clone()  # use a clone, don't touch self.vkm.vks

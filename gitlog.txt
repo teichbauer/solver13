@@ -1,3 +1,7 @@
+2021-07-13->0.224
+- bitgrid: when out_dic empty, now cover the case vk.nob < 3: return a 
+  list of covered values (if vk.nob == 3, returns a single cover-value)
+- progress in vkmgr and tnode.approve
 2021-07-12->0.223
 - progress
 2021-07-10->0.222

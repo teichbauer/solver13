@@ -34,7 +34,7 @@ class VKManager:
         vkm3 = None
         snode.next_choice = None
 
-        for vk in self.vkdic.values():
+        for kn, vk in self.vkdic.items():
             if vk.kname in snode.vk12dic:
                 vk12 = snode.vk12dic
             else:
@@ -49,6 +49,8 @@ class VKManager:
         if len(vk3dic) > 0:
             vkm3 = VKManager(vk3dic, self.nov - 3, True)
             snode.next_choice = vkm3.choose_anchor()
+        else:
+            snode.done = True
 
         for val in range(8):
             if val in snode.bitgrid.covers:
