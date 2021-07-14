@@ -40,12 +40,13 @@ class BitGrid:
                 v = set_bit(v, ind, vk.dic[b])
             else:
                 out_dic[b] = vk.dic[b]
-        if len(out_dic) == 0:  # vk covers all 3 bits
-            # return vk's compressed-value(single value), and None
-            if vk.nob == 3:
-                return vk.compressed_value(), None
-            else:
+        if len(out_dic) == 0:  # vk is covered by grid-3 bits totally
+            # there is no rvk (None)
+            if vk.nob == 3:   # cvs is a single value, not a list
+                cvs = vk.compressed_value()
+            elif vk.nob < 3:  # cvs is a list of values
                 cvs = self.vary_1bit(v, g)  # TB verified
+            return cvs, None
 
         ovk = VKlause(vk.kname, out_dic, vk.nov)
         if len(out_dic) < 3:

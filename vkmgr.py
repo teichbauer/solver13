@@ -52,6 +52,11 @@ class VKManager:
         else:
             snode.done = True
 
+        if snode.parent:
+            vdic = {}
+            for pv, ctnode in snode.parent.chdiv.items():
+                vdic[pv] = ctnode.approve(snode)
+
         for val in range(8):
             if val in snode.bitgrid.covers:
                 continue

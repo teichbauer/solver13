@@ -1,7 +1,7 @@
 # from typing_extensions import ParamSpecKwargs
 from vk12mgr import VK12Manager
 from basics import get_bit
-from satholder import SatHolder
+from vklause import VKlause
 from pathmgr import PathManager
 from bitgrid import BitGrid
 from center import Center
@@ -20,6 +20,8 @@ class SatNode:
         self.done = False
         self.choice = choice
         self.bitgrid = BitGrid(self.choice)
+        # vk2 = VKlause('test', {16: 1, 6: 1}, 60)
+        # cvs, rvk = self.bitgrid.cvs_and_outdic(vk2)
         self.prepare()
         Center.snodes[self.nov] = self
 
@@ -66,7 +68,7 @@ class SatNode:
         td_dic = Center.topdowns.setdefault(self.nov, {})
         novs = sorted(Center.skeleton.keys(), reverse=True)
         ind = novs.index(self.nov)
-        for nov in novs[ind + 1 :]:
+        for nov in novs[ind + 1:]:
             tname = f"{nov}."
             # bset = Center.snodes[nov].choice['bit_set']
             for vk in tnode.vkm.vkdic.values():
@@ -150,6 +152,7 @@ class SatNode:
         cnts = {}
         for nov, sn in Center.snodes.items():
             if nov < Center.maxnov:
-                cnt = {v: len(tn.pthmgr.dic.keys()) for v, tn in sn.chdic.items()}
+                cnt = {v: len(tn.pthmgr.dic.keys())
+                       for v, tn in sn.chdic.items()}
                 cnts[nov] = cnt
         return cnts
