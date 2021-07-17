@@ -29,6 +29,7 @@ class TNode:
         """
         grid = lwr_snode.bitgrid
         vkmdic = {}
+        dels = set([])
         for k in range(8):  # setup possible vk12ms
             if k not in grid.covers:
                 vkmdic[k] = VK12Manager(self.vkm.nov)
@@ -37,8 +38,11 @@ class TNode:
             cvs, vk12 = grid.cvs_and_outdic(vk)
             if cvs == None:  # vk12 didn't touch grid
                 # add vk12 to every vkms
-                for vk12m in vkmdic.values():
-                    vk12m.add(vk12)
+                for v, vk12m in vkmdic.items():
+                    vk12m.add_vk(vk12)
+                    if not vk12m.valid:
+                        dels.add(v)
+                        break
             elif vk12 == None:  # vk is totally covered by grid.
                 # cvs: list of values that are hit by vk
                 for cv in cvs:
@@ -46,7 +50,12 @@ class TNode:
             else:  # vk is partially hit by grid
                 for cv in cvs:
                     if cv in vkmdic:
-                        vkmdic[cv].add(vk12)
+                        vkmdic[cv].add_vk(vk12)
+                        if not vk12m.valid:
+                            dels.add(cv)
+                            break
+        for v in dels:
+            vkmdic.pop(v)
         return vkmdic
 
     def find_path_vk12m(self, pnode_leftover_vk12dic):

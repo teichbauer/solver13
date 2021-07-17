@@ -40,7 +40,8 @@ class BitGrid:
                 v = set_bit(v, ind, vk.dic[b])
             else:
                 out_dic[b] = vk.dic[b]
-        if len(out_dic) == 0:  # vk is covered by grid-3 bits totally
+        odic_ln = len(out_dic)
+        if odic_ln == 0:  # vk is covered by grid-3 bits totally
             # there is no rvk (None)
             if vk.nob == 3:   # cvs is a single value, not a list
                 cvs = vk.compressed_value()
@@ -49,7 +50,7 @@ class BitGrid:
             return cvs, None
 
         ovk = VKlause(vk.kname, out_dic, vk.nov)
-        if len(out_dic) < 3:
+        if odic_ln != vk.nob and odic_ln < 3:
             # get values of all possible settings of untouched bits in g
             cvs = self.vary_1bit(v, g)
             cvs.sort()

@@ -43,8 +43,8 @@ class VKManager:
                     if rvk.nob == 3:  # vk lies totally outside of 3-bits
                         vk3dic[kn] = rvk
                     else:  # vk covers 1 or 2 bits from bits. cvs is a list
-                        tdic.setdefault(tuple(cvs), []).append(vk12)
-                        snode.vk12dic[rvk.kname] = rvk  # rvk is vk12
+                        tdic.setdefault(tuple(cvs), []).append(rvk)
+                        snode.vk12dic[rvk.kname] = rvk  # rvk is a vk12
 
         if len(vk3dic) > 0:
             vkm3 = VKManager(vk3dic, self.nov - 3, True)
@@ -54,8 +54,13 @@ class VKManager:
 
         if snode.parent:
             vdic = {}
-            for pv, ctnode in snode.parent.chdiv.items():
-                vdic[pv] = ctnode.approve(snode)
+            for pv, ctnode in snode.parent.chdic.items():
+                vdic[f"{snode.parent.nov}.{pv}"] = ctnode.approve(snode)
+        pthdic = {}
+        for ky, vk12mdic in vdic.items():
+            for tv, vkm in vk12mdic.items():
+                tdic = pthdic.setdefault(tv, {})
+                tdic[ky] = vkm
 
         for val in range(8):
             if val in snode.bitgrid.covers:

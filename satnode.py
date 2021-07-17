@@ -26,7 +26,7 @@ class SatNode:
         Center.snodes[self.nov] = self
 
     def prepare(self):
-        self.make_skeleton()
+        # self.make_skeleton()
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         self.next_sh = self.sh.reduce(self.choice["bits"])
         self.next_vkm, self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
