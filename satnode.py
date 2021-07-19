@@ -13,13 +13,18 @@ class SatNode:
 
     def __init__(self, parent, sh, vkm, choice):
         self.parent = parent
+        if parent:
+            self.nov = parent.nov - 3
+        else:
+            self.nov = Center.maxnov
         self.sh = sh
         self.vkm = vkm
-        self.nov = vkm.nov
+        # holds the best-covering-vks from vkm.vkdic
+        self.bvks = []
         self.next = None
         self.done = False
         self.choice = choice
-        self.bitgrid = BitGrid(self.choice)
+        self.bitgrid = BitGrid(self)
         # vk2 = VKlause('test', {16: 1, 6: 1}, 60)
         # cvs, rvk = self.bitgrid.cvs_and_outdic(vk2)
         self.prepare()
@@ -29,8 +34,7 @@ class SatNode:
         # self.make_skeleton()
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         self.next_sh = self.sh.reduce(self.choice["bits"])
-        self.next_vkm, self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
-        self.done = (self.next_vkm == None) or len(self.next_vkm.vkdic) == 0
+        self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
 
         if self.debug:
             ks = [f"{self.nov}.{k}" for k in self.chdic.keys()]
@@ -48,21 +52,34 @@ class SatNode:
             self.done = True
             return None
         else:
-            self.next = SatNode(
-                self, self.next_sh.clone(), self.next_vkm, self.next_choice
-            )
+            self.next = SatNode(self,
+                                self.next_sh.clone(),
+                                self.vkm,
+                                self.next_choice
+                                )
             return self.next
 
-    def make_skeleton(self):
-        thsats = Center.skeleton.setdefault(self.nov, {})
-        cvrs = []
-        for bvk in self.choice["ancvks"]:
-            cvrs.append(bvk.compressed_value())
-        for v in range(8):
-            if v not in cvrs:
-                hsat = thsats.setdefault(v, {})
-                for indx, b in enumerate(self.choice["bits"]):
-                    hsat[b] = get_bit(v, 2 - indx)
+    def split_vkm(self):
+        # pop-out touched-vk3s forming vk12dic with them
+        # tdic: keyed by cvs of vks and values are lists of vks
+        # make next-choice from vkm - if not empty, if it is empty, done=True
+        tdic = {}
+        for kn in self.choice['touched']:
+            vk = self.vkm.pop_vk(kn)
+            cvs, rvk = self.bitgrid.cvs_and_outdic(vk)
+            for v in cvs:
+                if v not in self.bitgrid.covers:
+                    s = tdic.setdefault(v, set([]))
+                    s.add(rvk)
+                if kn not in self.vk12dic:
+                    self.vk12dic[kn] = rvk
+
+        if len(self.vkm.vkdic) == 0:
+            self.done = True
+            self.next_choice = None
+        else:
+            self.next_choice = self.vkm.choose_anchor()
+        return tdic
 
     def set_topdowns(self, tnode, bits):
         td_dic = Center.topdowns.setdefault(self.nov, {})

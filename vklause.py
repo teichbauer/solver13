@@ -8,10 +8,9 @@ class VKlause:
         the origin field refs to that (3-bits vk)
         '''
 
-    def __init__(self, kname, dic, nov):
+    def __init__(self, kname, dic):
         self.kname = kname    # this vk can be a partial one: len(bits) < 3)
         self.dic = dic  # { 7:1, 3: 0, 0: 1}, or {3:0, 1:1} or {3:1}
-        self.nov = nov  # number of variables (here: 8) - bits of value space
         # all bits, in descending order
         self.bits = sorted(dic.keys(), reverse=True)  # [7,3,0]
         # void bits of the nov-bits
@@ -42,7 +41,7 @@ class VKlause:
                 # drop off this bit from dic.
                 dic.pop(b, None)
         if len(dic) > 0:
-            return VKlause(self.kname, dic, self.nov)
+            return VKlause(self.kname, dic)
         else:
             return None
 
@@ -143,5 +142,5 @@ class VKlause:
         if len(td) == 0:
             total_hit = True
         else:
-            vk12 = VKlause(self.kname, td, self.nov)
+            vk12 = VKlause(self.kname, td)
         return total_hit, vk12

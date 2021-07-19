@@ -1,3 +1,6 @@
+2021-07-19->0.227
+- remove nov from vklause, vkmgr and vk12mgr
+- progress in satnode, vkmgr
 2021-07-16->0.226
 - fix in bitgrid in case outdic has all the bit of vk.
 - progress in vkmgr, tnode 

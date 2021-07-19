@@ -8,23 +8,24 @@ from vkmgr import VKManager
 from vklause import VKlause
 
 
-def make_vkdic(kdic, nov):
+def make_vkdic(kdic):
     vkdic = {}
     for kn, klause in kdic.items():
-        vkdic[kn] = VKlause(kn, klause, nov)
+        vkdic[kn] = VKlause(kn, klause)
     return vkdic
 
 
 def make_vkm(cnf_fname):
-    vkdic, nov = get_vkdic_from_cfg(cnf_fname)
-    return VKManager(vkdic, nov, True)
+    vkdic = get_vkdic_from_cfg(cnf_fname)
+    vkm = VKManager(vkdic, True)
+    Center.orig_vkm = vkm.clone()
+    return vkm
 
 
 def process(cnfname):
     vkm = make_vkm(cnfname)
     satslots = list(range(vkm.nov))
     sh = SatHolder(satslots)
-    Center.maxnov = sh.ln
 
     choice = vkm.choose_anchor()
     sn = SatNode(None, sh, vkm, choice)
@@ -36,9 +37,9 @@ def process(cnfname):
 
 def get_vkdic_from_cfg(cfgfile):
     sdic = get_sdic(cfgfile)
-
-    vkdic = make_vkdic(sdic["kdic"], sdic["nov"])
-    return vkdic, sdic["nov"]
+    Center.maxnov = sdic["nov"]
+    vkdic = make_vkdic(sdic["kdic"])
+    return vkdic
 
 
 def work(configfilename, verify=True):
@@ -49,8 +50,6 @@ def work(configfilename, verify=True):
     ln = len(sats)
     print(f"there are {ln} sats:")
 
-    vkdic, dummy = get_vkdic_from_cfg(configfilename)
-
     for ind, sat in enumerate(sats):
         msg, cnt2 = ordered_dic_string(sat)
         if cnt2 > 0:
@@ -59,7 +58,7 @@ def work(configfilename, verify=True):
             m = f"{ind+1}:"
         m += msg
         if verify:
-            verified = verify_sat(vkdic, sat)
+            verified = verify_sat(Center.orig_vkm.vkdic, sat)
             m += f", verified: {verified}"
         print(m)
     print(f"Time used: {time_used}")

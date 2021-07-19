@@ -3,10 +3,13 @@ from vklause import VKlause
 
 
 class BitGrid:
-    def __init__(self, choice):  # grid_bits):
+    def __init__(self, snode):  # grid_bits):
         # grid-bits: high -> low, descending order
-        self.grids = list(reversed(choice["bits"]))  # bits
-        self.covers = [vk.compressed_value() for vk in choice["ancvks"]]
+        self.grids = list(reversed(snode.choice["bits"]))  # bits
+        for vk in snode.choice['ancvks']:
+            snode.bvks.append(snode.vkm.pop_vk(vk.kname))
+        self.covers = [vk.compressed_value() for vk in snode.bvks]
+        self.chheads = set(range(8)).difference(self.covers)
 
     def vary_1bit(self, val, bits, cvs=None):
         if cvs == None:

@@ -6,8 +6,7 @@ class VK12Manager:
     # debug = True
     debug = False
 
-    def __init__(self, nov, vkdic=None, raw=False):
-        self.nov = nov
+    def __init__(self, vkdic=None, raw=False):
         self.valid = True  # no sat possible/total hit-blocked
         if not raw:
             self.reset()  # set vkdic, bdic, kn1s, kn2s
@@ -23,7 +22,7 @@ class VK12Manager:
 
     def clone(self):
         # self.valid must be True. Construct with: no vkdic, raw=True(no reset)
-        vk12m = VK12Manager(self.nov, None, True)
+        vk12m = VK12Manager(None, True)
         vk12m.bdic = {k: lst[:] for k, lst in self.bdic.items()}
         vk12m.kn1s = self.kn1s[:]
         vk12m.kn2s = self.kn2s[:]
@@ -242,7 +241,8 @@ class VK12Manager:
                     vks = tdic[cvr]
                     for vk in vks:
                         sub_vk12dic[vk.kname] = vk.clone()
-            vkm = VK12Manager(self.nov - n12.sh.ln, sub_vk12dic)
+            # vkm = VK12Manager(self.nov - n12.sh.ln, sub_vk12dic)
+            vkm = VK12Manager(sub_vk12dic)
             if vkm.valid:
                 node = n12.__class__(
                     n12,  # n12 is parent-node

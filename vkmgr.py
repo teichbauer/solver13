@@ -5,16 +5,24 @@ from center import Center
 
 
 class VKManager:
-    def __init__(self, vkdic, nov, initial=False):
+    def __init__(self, vkdic, initial=False):
         self.vkdic = vkdic
-        self.nov = nov
         if initial:
             self.make_bdic()
 
     def clone(self):
         vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
-        vkm = VKManager(vkdic, self.nov)
+        vkm = VKManager(vkdic)
         vkm.bdic = {b: s.copy() for b, s in self.bdic.items()}
+
+    def pop_vk(self, kn):
+        vk = self.vkdic.pop(kn)
+        for bit in vk.bits:
+            if kn in self.bdic[bit]:
+                self.bdic[bit].remove(kn)
+            else:
+                raise Exception(f"pop {kn} failed")
+        return vk
 
     def printjson(self, filename):
         print_json(self.nov, self.vkdic, filename)
@@ -28,58 +36,32 @@ class VKManager:
                 self.bdic[b].add(kn)
 
     def morph(self, snode):
-        chs = {}  # {<cvr-val>: {kn, ..},..}
-        vk3dic = {}
-        tdic = {}
-        vkm3 = None
-        snode.next_choice = None
-
-        for kn, vk in self.vkdic.items():
-            if vk.kname in snode.vk12dic:
-                vk12 = snode.vk12dic
-            else:
-                cvs, rvk = snode.bitgrid.cvs_and_outdic(vk)
-                if rvk:
-                    if rvk.nob == 3:  # vk lies totally outside of 3-bits
-                        vk3dic[kn] = rvk
-                    else:  # vk covers 1 or 2 bits from bits. cvs is a list
-                        tdic.setdefault(tuple(cvs), []).append(rvk)
-                        snode.vk12dic[rvk.kname] = rvk  # rvk is a vk12
-
-        if len(vk3dic) > 0:
-            vkm3 = VKManager(vk3dic, self.nov - 3, True)
-            snode.next_choice = vkm3.choose_anchor()
-        else:
-            snode.done = True
-
+        tdic = snode.split_vkm()
+        pthdic = {}
         if snode.parent:
             vdic = {}
             for pv, ctnode in snode.parent.chdic.items():
                 vdic[f"{snode.parent.nov}.{pv}"] = ctnode.approve(snode)
-        pthdic = {}
-        for ky, vk12mdic in vdic.items():
-            for tv, vkm in vk12mdic.items():
-                tdic = pthdic.setdefault(tv, {})
-                tdic[ky] = vkm
 
-        for val in range(8):
-            if val in snode.bitgrid.covers:
-                continue
+            for ky, vk12mdic in vdic.items():
+                for tv, vkm in vk12mdic.items():
+                    tmpdic = pthdic.setdefault(tv, {})
+                    tmpdic[ky] = vkm
+
+        for val in tdic:
             sub_vk12dic = {}
-            for cvr in tdic:
-                if val in cvr:  # touched kn/kv does have outside bit
-                    vk2s = tdic[cvr]
-                    for vk2 in vk2s:
-                        sub_vk12dic[vk2.kname] = vk2.clone()
+            if val in tdic:  # touched kn/kv does have outside bit
+                vk2s = tdic[val]
+                for vk2 in vk2s:
+                    sub_vk12dic[vk2.kname] = vk2
             # print(f'child-{val}')
             tnode = TNode(sub_vk12dic, snode, val)
             if tnode.vkm.valid:
                 Center.repo[tnode.name] = tnode
-                chs[val] = tnode
+                pthdic[val] = tnode
         # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
-        self.make_bdic()  # make bdic to be used for .next/choose_anchor
         # for making chdic with tnodes
-        return vkm3, chs
+        return pthdic
 
     # enf of def morph()
 
