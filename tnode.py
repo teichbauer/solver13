@@ -10,7 +10,7 @@ class TNode:
         self.sh = holder_snode.next_sh
         self.name = f"{self.holder.nov}.{val}"
         self.hsat = holder_snode.sh.get_sats(val)
-        self.vkm = VK12Manager(self.sh.ln, vk12dic)
+        self.vkm = VK12Manager(vk12dic)
 
     def check_sat(self, sdic):
         vk12dic = {}
@@ -22,27 +22,27 @@ class TNode:
                 vk12dic[kn] = vk12
         return vk12dic
 
-    def approve(self, lwr_snode):  # next/lower snode, with its bitgrid
+    def approve(self, grid):  # next/lower snode, with its bitgrid
         # grid is bitgrid of next(lower snode)
         """for the grid of next(lower) level snode, do
         1.
         """
-        grid = lwr_snode.bitgrid
         vkmdic = {}
-        dels = set([])
-        for k in range(8):  # setup possible vk12ms
-            if k not in grid.covers:
-                vkmdic[k] = VK12Manager(self.vkm.nov)
-
+        for k in grid.chheads:  # setup empty vk12ms for every ch-tnode
+            vkmdic[k] = VK12Manager()
+        # if any vk in self.vkm is hit by the grid/v, this v will be
+        # put into dels, so that v/vkm pair be deleted from vkmdic
         for kn, vk in self.vkm.vkdic.items():
             cvs, vk12 = grid.cvs_and_outdic(vk)
             if cvs == None:  # vk12 didn't touch grid
                 # add vk12 to every vkms
-                for v, vk12m in vkmdic.items():
-                    vk12m.add_vk(vk12)
-                    if not vk12m.valid:
-                        dels.add(v)
-                        break
+                # for v, vk12m in vkmdic.items():
+                for v in grid.chheads:
+                    if v in vkmdic:
+                        vkmdic[v].add_vk(vk12)
+                        if not vkmdic[v].valid:
+                            del vkmdic[v]
+                            break
             elif vk12 == None:  # vk is totally covered by grid.
                 # cvs: list of values that are hit by vk
                 for cv in cvs:
@@ -51,11 +51,8 @@ class TNode:
                 for cv in cvs:
                     if cv in vkmdic:
                         vkmdic[cv].add_vk(vk12)
-                        if not vk12m.valid:
-                            dels.add(cv)
-                            break
-        for v in dels:
-            vkmdic.pop(v)
+                        if not vkmdic[cv].valid:
+                            del vkmdic[cv]
         return vkmdic
 
     def find_path_vk12m(self, pnode_leftover_vk12dic):

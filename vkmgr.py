@@ -41,7 +41,8 @@ class VKManager:
         if snode.parent:
             vdic = {}
             for pv, ctnode in snode.parent.chdic.items():
-                vdic[f"{snode.parent.nov}.{pv}"] = ctnode.approve(snode)
+                vdic[f"{snode.parent.nov}.{pv}"] = ctnode.approve(
+                    snode.bitgrid)
 
             for ky, vk12mdic in vdic.items():
                 for tv, vkm in vk12mdic.items():

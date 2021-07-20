@@ -24,7 +24,7 @@ def make_vkm(cnf_fname):
 
 def process(cnfname):
     vkm = make_vkm(cnfname)
-    satslots = list(range(vkm.nov))
+    satslots = list(range(Center.maxnov))
     sh = SatHolder(satslots)
 
     choice = vkm.choose_anchor()

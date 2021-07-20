@@ -52,7 +52,7 @@ class BitGrid:
                 cvs = self.vary_1bit(v, g)  # TB verified
             return cvs, None
 
-        ovk = VKlause(vk.kname, out_dic, vk.nov)
+        ovk = VKlause(vk.kname, out_dic)
         if odic_ln != vk.nob and odic_ln < 3:
             # get values of all possible settings of untouched bits in g
             cvs = self.vary_1bit(v, g)

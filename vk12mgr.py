@@ -42,13 +42,13 @@ class VK12Manager:
 
     def add_vkdic(self, vkdic):
         for vk in vkdic.values():
-            self.add_vk(vk.clone())
+            self.add_vk(vk)
 
     def add_vk(self, vk):
         if vk.nob == 1:
-            self.add_vk1(vk)
+            self.add_vk1(vk.clone())
         elif vk.nob == 2:
-            self.add_vk2(vk)
+            self.add_vk2(vk.clone())
 
     # end of def add_vk(self, vk):
 
