@@ -48,13 +48,19 @@ class VKManager:
                 for tv, vkm in vk12mdic.items():
                     tmpdic = pthdic.setdefault(tv, {})
                     tmpdic[ky] = vkm
-
+            dels = set(pthdic.keys())
             for tv, pd in pthdic.items():
                 for tn, td in pd.items():
                     if td.vkm.add_vkdic(vk2grps[tv]):
+                        if td.val in dels:
+                            # td has a path: dont delete it
+                            dels.remove(td.val)
                         td.name += "-" + tn
                     else:
                         pass
+            for dk in dels:
+                # for not-in-use td, remove it from pthdic
+                del pthdic[dk]
         else:
             for v in vk2grps:
                 vkm = VK12Manager(vk2grps[v])
