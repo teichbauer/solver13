@@ -1,3 +1,4 @@
+from vk12mgr import VK12Manager
 from basics import print_json
 from vklause import VKlause
 from tnode import TNode
@@ -35,33 +36,30 @@ class VKManager:
                     self.bdic[b] = set([])  # bdic.setdefault(b,set([]))
                 self.bdic[b].add(kn)
 
-    def morph(self, snode):
-        tdic = snode.split_vkm()
+    def morph(self, sn):
+        vk2grps = sn.split_vkm()
         pthdic = {}
-        if snode.parent:
+        if sn.parent:
             vdic = {}
-            for pv, ctnode in snode.parent.chdic.items():
-                vdic[f"{snode.parent.nov}.{pv}"] = ctnode.approve(
-                    snode.bitgrid)
+            for pv, ctnode in sn.parent.chdic.items():
+                vdic[f"{sn.parent.nov}.{pv}"] = ctnode.approve(sn)
 
             for ky, vk12mdic in vdic.items():
                 for tv, vkm in vk12mdic.items():
                     tmpdic = pthdic.setdefault(tv, {})
                     tmpdic[ky] = vkm
 
-        for val in tdic:
-            sub_vk12dic = {}
-            if val in tdic:  # touched kn/kv does have outside bit
-                vk2s = tdic[val]
-                for vk2 in vk2s:
-                    sub_vk12dic[vk2.kname] = vk2
-            # print(f'child-{val}')
-            tnode = TNode(sub_vk12dic, snode, val)
-            if tnode.vkm.valid:
-                Center.repo[tnode.name] = tnode
-                pthdic[val] = tnode
-        # re-make self.bdic, based on updated vkdic (now all 3-bit vks)
-        # for making chdic with tnodes
+            for tv, pd in pthdic.items():
+                for tn, td in pd.items():
+                    if td.vkm.add_vkdic(vk2grps[tv]):
+                        td.name += "-" + tn
+                    else:
+                        pass
+        else:
+            for v in vk2grps:
+                vkm = VK12Manager(vk2grps[v])
+                if vkm.valid:
+                    pthdic[v] = TNode(vkm, sn, v)
         return pthdic
 
     # enf of def morph()

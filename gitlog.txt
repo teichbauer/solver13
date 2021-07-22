@@ -1,6 +1,5 @@
-2021-07-20->0.228
-- fix in vk12mgr: when add_vk(vk), vk will first be cloned b4 use.
-- tnode/approve: recode
+2021-07-21->0.228
+- progress on snode, tnode, vk12mgr, vkmgr/morph
 2021-07-19->0.227
 - remove nov from vklause, vkmgr and vk12mgr
 - progress in satnode, vkmgr

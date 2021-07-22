@@ -4,40 +4,33 @@ from center import Center
 
 
 class TNode:
-    def __init__(self, vk12dic, holder_snode, val):
+    # def __init__(self, vk12dic, holder_snode, val):
+    def __init__(self, vk12m, holder_snode, val):
         self.val = val
         self.holder = holder_snode
-        self.sh = holder_snode.next_sh
+        # self.sh = holder_snode.next_sh
         self.name = f"{self.holder.nov}.{val}"
-        self.hsat = holder_snode.sh.get_sats(val)
-        self.vkm = VK12Manager(vk12dic)
+        # self.hsat = holder_snode.sh.get_sats(val)
+        self.vkm = vk12m
+        # self.vkm = VK12Manager(vk12dic)
 
-    def check_sat(self, sdic):
-        vk12dic = {}
-        for kn, vk in self.vkm.vkdic.items():
-            total_hit, vk12 = vk.partial_hit_residue(sdic)
-            if total_hit:
-                return None
-            elif vk12:
-                vk12dic[kn] = vk12
-        return vk12dic
-
-    def approve(self, grid):  # next/lower snode, with its bitgrid
+    def approve(self, sn):  # next/lower snode, with its bitgrid
         # grid is bitgrid of next(lower snode)
         """for the grid of next(lower) level snode, do
         1.
         """
+        gd = sn.bitgrid
         vkmdic = {}
-        for k in grid.chheads:  # setup empty vk12ms for every ch-tnode
+        for k in gd.chheads:  # setup empty vk12ms for every ch-tnode
             vkmdic[k] = VK12Manager()
         # if any vk in self.vkm is hit by the grid/v, this v will be
         # put into dels, so that v/vkm pair be deleted from vkmdic
         for kn, vk in self.vkm.vkdic.items():
-            cvs, vk12 = grid.cvs_and_outdic(vk)
+            cvs, vk12 = gd.cvs_and_outdic(vk)
             if cvs == None:  # vk12 didn't touch grid
                 # add vk12 to every vkms
                 # for v, vk12m in vkmdic.items():
-                for v in grid.chheads:
+                for v in gd.chheads:
                     if v in vkmdic:
                         vkmdic[v].add_vk(vk12)
                         if not vkmdic[v].valid:
@@ -53,7 +46,17 @@ class TNode:
                         vkmdic[cv].add_vk(vk12)
                         if not vkmdic[cv].valid:
                             del vkmdic[cv]
-        return vkmdic
+        return {v: TNode(vkm, sn, v) for v, vkm in vkmdic.items()}
+
+    def check_sat(self, sdic):
+        vk12dic = {}
+        for kn, vk in self.vkm.vkdic.items():
+            total_hit, vk12 = vk.partial_hit_residue(sdic)
+            if total_hit:
+                return None
+            elif vk12:
+                vk12dic[kn] = vk12
+        return vk12dic
 
     def find_path_vk12m(self, pnode_leftover_vk12dic):
         vk12m = self.vkm.clone()  # use a clone, don't touch self.vkm.vks

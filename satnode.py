@@ -73,13 +73,18 @@ class SatNode:
                     s.add(rvk)
                 if kn not in self.vk12dic:
                     self.vk12dic[kn] = rvk
+        grps = {v: {} for v in tdic}
+        for v in tdic:
+            for vk2 in tdic[v]:
+                grps[v][vk2.kname] = vk2
 
         if len(self.vkm.vkdic) == 0:
             self.done = True
             self.next_choice = None
         else:
             self.next_choice = self.vkm.choose_anchor()
-        return tdic
+        # return tdic
+        return grps
 
     def set_topdowns(self, tnode, bits):
         td_dic = Center.topdowns.setdefault(self.nov, {})
