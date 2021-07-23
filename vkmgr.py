@@ -38,29 +38,25 @@ class VKManager:
 
     def morph(self, sn):
         vk2grps = sn.split_vkm()
-        pthdic = {}
+        pthdic = {v: {} for v in vk2grps.keys()}
         if sn.parent:
-            vdic = {}
             for pv, ctnode in sn.parent.chdic.items():
-                vdic[f"{sn.parent.nov}.{pv}"] = ctnode.approve(sn)
-
-            for ky, vk12mdic in vdic.items():
-                for tv, vkm in vk12mdic.items():
-                    tmpdic = pthdic.setdefault(tv, {})
-                    tmpdic[ky] = vkm
-            dels = set(pthdic.keys())
-            for tv, pd in pthdic.items():
-                for tn, td in pd.items():
-                    if td.vkm.add_vkdic(vk2grps[tv]):
-                        if td.val in dels:
-                            # td has a path: dont delete it
-                            dels.remove(td.val)
-                        td.name += "-" + tn
-                    else:
+                if type(ctnode).__name__ == 'TNode':
+                    name = f"{sn.parent.nov}.{pv}"
+                    dic = ctnode.approve(sn)
+                    for v in pthdic:
+                        vname = f"{sn.nov}.{v}-" + name
+                        tnode = dic[v]
+                        if tnode.vkm.add_vkdic(vk2grps[v]):
+                            tnode.name = vname
+                            pthdic[v][vname] = tnode
+                elif type(ctnode).__name__ == 'dict':
+                    for kv, tn in ctnode.items():
                         pass
-            for dk in dels:
-                # for not-in-use td, remove it from pthdic
-                del pthdic[dk]
+
+            for v in vk2grps:
+                if len(pthdic[v]) == 0:
+                    del pthdic[v]
         else:
             for v in vk2grps:
                 vkm = VK12Manager(vk2grps[v])
