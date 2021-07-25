@@ -39,7 +39,7 @@ class TNode:
             elif vk12 == None:  # vk is totally covered by grid.
                 # cvs: list of values that are hit by vk
                 for cv in cvs:
-                    del vkmdic[cv]
+                    vkmdic.pop(cv, None)
             else:  # vk is partially hit by grid
                 for cv in cvs:
                     if cv in vkmdic:

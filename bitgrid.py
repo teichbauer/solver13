@@ -5,7 +5,7 @@ from vklause import VKlause
 class BitGrid:
     def __init__(self, snode):  # grid_bits):
         # grid-bits: high -> low, descending order
-        self.grids = list(reversed(snode.choice["bits"]))  # bits
+        self.grids = tuple(reversed(snode.choice["bits"]))  # bits
         self.covers = tuple(vk.compressed_value() for vk in snode.bvks)
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 

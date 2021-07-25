@@ -55,9 +55,7 @@ class VKManager:
                         # tn: a path-tnode from parent-level
                         # dic: start-tnode-base keyed by every v in pthdic
                         dic = tn.approve(sn)
-                        for v in pthdic:
-                            tnode = dic[v]  # get tnode-base for v
-                            #
+                        for v, tnode in dic.items():
                             if tnode.vkm.add_vkdic(vk2grps[v]):
                                 vname = f"{sn.nov}.{v}-" + tn_key
                                 tnode.name = vname

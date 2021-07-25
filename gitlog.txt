@@ -1,3 +1,6 @@
+2021-07-25->0.232
+- progress in vkmgr/morph
+- fix in tnode
 2021-07-25->0.231
 - progress in vkmgr/morph
 - optimized bitgrid and satnode: bvks and chheads are now tuples, 
