@@ -37,22 +37,31 @@ class VKManager:
                 self.bdic[b].add(kn)
 
     def morph(self, sn):
-        vk2grps = sn.split_vkm()
-        pthdic = {v: {} for v in vk2grps.keys()}
+        vk2grps = sn.split_vkm()  # dic of  vkms keyed by chhead of sn
+        pthdic = {v: {} for v in sn.bitgrid.chheads}
         if sn.parent:
             for pv, ctnode in sn.parent.chdic.items():
                 if type(ctnode).__name__ == 'TNode':
-                    name = f"{sn.parent.nov}.{pv}"
+                    # dic: start-tnode-base keyed by every v in pthdic
                     dic = ctnode.approve(sn)
                     for v in pthdic:
-                        vname = f"{sn.nov}.{v}-" + name
                         tnode = dic[v]
                         if tnode.vkm.add_vkdic(vk2grps[v]):
+                            vname = f"{sn.nov}.{v}-" + ctnode.name
                             tnode.name = vname
                             pthdic[v][vname] = tnode
                 elif type(ctnode).__name__ == 'dict':
-                    for kv, tn in ctnode.items():
-                        pass
+                    for tn_key, tn in ctnode.items():
+                        # tn: a path-tnode from parent-level
+                        # dic: start-tnode-base keyed by every v in pthdic
+                        dic = tn.approve(sn)
+                        for v in pthdic:
+                            tnode = dic[v]  # get tnode-base for v
+                            #
+                            if tnode.vkm.add_vkdic(vk2grps[v]):
+                                vname = f"{sn.nov}.{v}-" + tn_key
+                                tnode.name = vname
+                                pthdic[v][vname] = tnode
 
             for v in vk2grps:
                 if len(pthdic[v]) == 0:

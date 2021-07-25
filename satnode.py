@@ -24,9 +24,8 @@ class SatNode:
         self.next = None
         self.done = False
         self.choice = choice
+        self.bvks = tuple(vkm.pop_vk(vk.kname) for vk in choice["ancvks"])
         self.bitgrid = BitGrid(self)
-        # vk2 = VKlause('test', {16: 1, 6: 1}, 60)
-        # cvs, rvk = self.bitgrid.cvs_and_outdic(vk2)
         self.prepare()
         Center.snodes[self.nov] = self
 
