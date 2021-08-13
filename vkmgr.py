@@ -56,7 +56,7 @@ class VKManager:
                         # dic: start-tnode-base keyed by every v in pthdic
                         dic = tn.approve(sn)
                         for v, tnode in dic.items():
-                            if tnode.vkm.add_vkdic(vk2grps[v]):
+                            if v in vk2grps and tnode.vkm.add_vkdic(vk2grps[v]):
                                 vname = f"{sn.nov}.{v}-" + tn_key
                                 tnode.name = vname
                                 pthdic[v][vname] = tnode
@@ -69,6 +69,7 @@ class VKManager:
                 vkm = VK12Manager(vk2grps[v])
                 if vkm.valid:
                     pthdic[v] = TNode(vkm, sn, v)
+        Center.add_path_tnodes(pthdic)
         return pthdic
 
     # enf of def morph()

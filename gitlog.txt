@@ -1,3 +1,6 @@
+2021-08-13->0.233
+- diagnostic tool in center: saves path-info.json. I already saved that of 
+  solver12. Now I can compare, to analize what is going on.
 2021-07-25->0.232
 - progress in vkmgr/morph
 - fix in tnode

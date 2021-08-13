@@ -34,6 +34,8 @@ class SatNode:
         self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         self.next_sh = self.sh.reduce(self.choice["bits"])
         self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
+        if self.nov == 24:
+            Center.save_pathdic('path-info.json')
 
         if self.debug:
             ks = [f"{self.nov}.{k}" for k in self.chdic.keys()]
