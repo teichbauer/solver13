@@ -87,45 +87,6 @@ class SatNode:
         # return tdic
         return grps
 
-    def set_topdowns(self, tnode, bits):
-        td_dic = Center.topdowns.setdefault(self.nov, {})
-        novs = sorted(Center.skeleton.keys(), reverse=True)
-        ind = novs.index(self.nov)
-        for nov in novs[ind + 1:]:
-            tname = f"{nov}."
-            # bset = Center.snodes[nov].choice['bit_set']
-            for vk in tnode.vkm.vkdic.values():
-                lst = bits[:]  # [25,7,1]
-                vk.compressed_value(lst)
-                ss = bset.intersection(vk.bits)
-                if len(ss) > 0:
-                    if set(vk.bits) == ss:
-                        vkv = vk.compressed_value()
-                    else:
-                        pass
-
-                    pass
-                else:
-                    pass
-
-            sdics = Center.skeleton[nov]
-            for v, sdic in sdics.items():
-                tname += f"{v}"
-                add_it = True
-                td_vkm = VK12Manager(Center.maxnov)
-                for kn, vk in tnode.vkm.vkdic.items():
-                    ttl_hit, v12 = vk.partial_hit_residue(sdic)
-                    if ttl_hit:
-                        add_it = False
-                        break
-                    elif v12:
-                        td_vkm.add_vk(v12)
-                        if not td_vkm.valid:
-                            add_it = False
-                            break
-                if add_it:
-                    td_dic[v] = td_vkm
-
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode
             return

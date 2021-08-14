@@ -1,3 +1,5 @@
+2021-08-13->0.234
+- Center now outputs path-info.json comparable with that from solver12.
 2021-08-13->0.233
 - diagnostic tool in center: saves path-info.json. I already saved that of 
   solver12. Now I can compare, to analize what is going on.

@@ -13,11 +13,23 @@ class Center:
     pathdic = {}
 
     @classmethod
+    def get_vklist(cls, vkm, leng):
+        lst = []
+        if leng == 1:
+            ks = sorted(vkm.kn1s)
+        elif leng == 2:
+            ks = sorted(vkm.kn2s)
+        for k in ks:
+            msg = f'{k}: ' + str(vkm.vkdic[k].dic)
+            lst.append(msg)
+        return lst
+
+    @classmethod
     def add_vkm(cls, name, vkm):
         dic = cls.pathdic.setdefault(name, {})
         dic['all-vk'] = len(vkm.vkdic)
-        dic['kn1s'] = vkm.kn1s
-        dic['kn2s'] = vkm.kn2s
+        dic['kn1s'] = cls.get_vklist(vkm, 1)
+        dic['kn2s'] = cls.get_vklist(vkm, 2)
 
     @classmethod
     def add_path_tnodes(cls, pathdic):
@@ -30,10 +42,11 @@ class Center:
     def add_paths(cls, pathdic):
         for key, vkm12 in pathdic.items():
             name = '-'.join(key)
-            dic = cls.pathdic.setdefault(name, {})
-            dic['all-vk'] = len(vkm12.vkdic)
-            dic['kn1s'] = vkm12.kn1s
-            dic['kn2s'] = vkm12.kn2s
+            cls.get_vklist(name, vkm12)
+            # dic = cls.pathdic.setdefault(name, {})
+            # dic['all-vk'] = len(vkm12.vkdic)
+            # dic['kn1s'] = vkm12.kn1s
+            # dic['kn2s'] = vkm12.kn2s
 
     @classmethod
     def save_pathdic(cls, filename):
