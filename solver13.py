@@ -29,9 +29,9 @@ def process(cnfname):
 
     choice = vkm.choose_anchor()
     sn = SatNode(None, sh, vkm, choice)
-    while not sn.done:
-        # print(f'spawning at nov = {sn.nov}')
-        sn = sn.spawn()
+    # while not sn.done:
+    #     # print(f'spawning at nov = {sn.nov}')
+    #     sn = sn.spawn()
     return sn.solve()
 
 

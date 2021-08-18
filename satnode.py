@@ -25,21 +25,17 @@ class SatNode:
         self.done = False
         self.choice = choice
         self.bvks = tuple(vkm.pop_vk(vk.kname) for vk in choice["ancvks"])
+        self.next_sh = self.sh.reduce(self.choice["bits"])
         self.bitgrid = BitGrid(self)
-        self.prepare()
+        self.split_vkm()
+        # self.prepare()
         Center.snodes[self.nov] = self
 
     def prepare(self):
-        # self.make_skeleton()
-        self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
-        self.next_sh = self.sh.reduce(self.choice["bits"])
         self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
         if self.nov == 24:
             Center.save_pathdic('path-info.json')
 
-        if self.debug:
-            ks = [f"{self.nov}.{k}" for k in self.chdic.keys()]
-            print(f"keys: {ks}")
         if self.done:
             for nov, sn in Center.snodes.items():
                 pass
@@ -49,21 +45,18 @@ class SatNode:
     def spawn(self):
         # print(f'snode-nov{self.nov}')
         # after morph, vkm.vkdic only have vk3s left, if any
-        if len(self.chdic) == 0:
-            self.done = True
-            return None
-        else:
-            self.next = SatNode(self,
-                                self.next_sh.clone(),
-                                self.vkm,
-                                self.next_choice
-                                )
-            return self.next
+        self.next = SatNode(self,
+                            self.next_sh.clone(),
+                            self.vkm,
+                            self.next_choice
+                            )
+        return self.next
 
     def split_vkm(self):
         # pop-out touched-vk3s forming vk12dic with them
         # tdic: keyed by cvs of vks and values are lists of vks
         # make next-choice from vkm - if not empty, if it is empty, done=True
+        self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
         tdic = {}
         for kn in self.choice['touched']:
             vk = self.vkm.pop_vk(kn)
@@ -74,18 +67,18 @@ class SatNode:
                     s.add(rvk)
                 if kn not in self.vk12dic:
                     self.vk12dic[kn] = rvk
-        grps = {v: {} for v in tdic}
+        self.grps = {v: {} for v in tdic}
         for v in tdic:
             for vk2 in tdic[v]:
-                grps[v][vk2.kname] = vk2
+                self.grps[v][vk2.kname] = vk2
 
         if len(self.vkm.vkdic) == 0:
             self.done = True
             self.next_choice = None
         else:
             self.next_choice = self.vkm.choose_anchor()
-        # return tdic
-        return grps
+            self.next = SatNode(
+                self, self.next_sh.clone(), self.vkm, self.next_choice)
 
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode
@@ -131,12 +124,3 @@ class SatNode:
 
     def solve(self):
         return Center.sats
-
-    def update_cnt(self):
-        cnts = {}
-        for nov, sn in Center.snodes.items():
-            if nov < Center.maxnov:
-                cnt = {v: len(tn.pthmgr.dic.keys())
-                       for v, tn in sn.chdic.items()}
-                cnts[nov] = cnt
-        return cnts

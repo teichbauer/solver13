@@ -1,3 +1,7 @@
+2021-08-18->0.235
+- split-vkm for every snode down to the one snote with vkm length==0
+  now every snode has its bitgrid, grps.
+- TBD: snode.solve.
 2021-08-13->0.234
 - Center now outputs path-info.json comparable with that from solver12.
 2021-08-13->0.233
