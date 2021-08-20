@@ -29,10 +29,7 @@ def process(cnfname):
 
     choice = vkm.choose_anchor()
     sn = SatNode(None, sh, vkm, choice)
-    # while not sn.done:
-    #     # print(f'spawning at nov = {sn.nov}')
-    #     sn = sn.spawn()
-    return sn.solve()
+    return sn.spawn()
 
 
 def get_vkdic_from_cfg(cfgfile):

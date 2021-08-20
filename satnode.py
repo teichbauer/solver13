@@ -1,7 +1,8 @@
 # from typing_extensions import ParamSpecKwargs
+from vklause import VKlause
 from vk12mgr import VK12Manager
 from basics import get_bit
-from vklause import VKlause
+from tnode import TNode
 from pathmgr import PathManager
 from bitgrid import BitGrid
 from center import Center
@@ -31,26 +32,39 @@ class SatNode:
         # self.prepare()
         Center.snodes[self.nov] = self
 
-    def prepare(self):
-        self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
-        if self.nov == 24:
-            Center.save_pathdic('path-info.json')
-
+    def spawn(self):
+        self.chdic = {v: {} for v in self.bitgrid.chheads}
+        if self.parent:
+            for pv, ctnode in self.parent.chdic.items():
+                if type(ctnode).__name__ == 'TNode':
+                    pass
+                elif type(ctnode).__name__ == 'dict':
+                    pass
+            pass
+        else:
+            for v in self.vk2grps:
+                vkm = VK12Manager(self.vk2grps[v])
+                if vkm.valid:
+                    tnode = TNode(vkm, self, f"{self.nov}.{v}")
+                    if self.next:
+                        tnode.vkgrps = self.next.bitgrid.find_vkgrps(tnode)
+                    self.chdic[v] = tnode
+            pass
         if self.done:
-            for nov, sn in Center.snodes.items():
-                pass
+            return Center.sats
+        else:
+            return self.next.spawn()
+
+    # def prepare(self):
+    #     self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
+    #     if self.nov == 24:
+    #         Center.save_pathdic('path-info.json')
+
+    #     if self.done:
+    #         for nov, sn in Center.snodes.items():
+    #             pass
 
     # end of def prepare(self):
-
-    def spawn(self):
-        # print(f'snode-nov{self.nov}')
-        # after morph, vkm.vkdic only have vk3s left, if any
-        self.next = SatNode(self,
-                            self.next_sh.clone(),
-                            self.vkm,
-                            self.next_choice
-                            )
-        return self.next
 
     def split_vkm(self):
         # pop-out touched-vk3s forming vk12dic with them
@@ -60,17 +74,18 @@ class SatNode:
         tdic = {}
         for kn in self.choice['touched']:
             vk = self.vkm.pop_vk(kn)
-            cvs, rvk = self.bitgrid.cvs_and_outdic(vk)
+            cvs, outdic = self.bitgrid.cvs_and_outdic(vk)
+            rvk = VKlause(vk.kname, outdic)
             for v in cvs:
                 if v not in self.bitgrid.covers:
                     s = tdic.setdefault(v, set([]))
                     s.add(rvk)
                 if kn not in self.vk12dic:
                     self.vk12dic[kn] = rvk
-        self.grps = {v: {} for v in tdic}
+        self.vk2grps = {v: {} for v in tdic}
         for v in tdic:
             for vk2 in tdic[v]:
-                self.grps[v][vk2.kname] = vk2
+                self.vk2grps[v][vk2.kname] = vk2
 
         if len(self.vkm.vkdic) == 0:
             self.done = True
@@ -95,7 +110,8 @@ class SatNode:
                 higher_vals_inuse.update(high_vals)
         # clean-up ch-tnodes, if its pthmgr.dic is empty
         for tnode in dels:
-            self.chdic.pop(tnode.val)
+            # TBD: tnode.val?
+            # self.chdic.pop(tnode.val)
             Center.repo.pop(tnode.name, None)
         self.done = len(self.chdic) == 0
         # clean-up higher-chs not being used by any tnode
@@ -121,6 +137,3 @@ class SatNode:
 
     def is_top(self):
         return self.nov == Center.maxnov
-
-    def solve(self):
-        return Center.sats

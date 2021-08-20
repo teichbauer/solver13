@@ -9,6 +9,21 @@ class BitGrid:
         self.covers = tuple(vk.compressed_value() for vk in snode.bvks)
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
+    def find_vkgrps(self, tnode):
+        grps = {v: {} for v in self.chheads}
+        for kn, vk in tnode.vmk.vkdic.items():
+            cvs, odic = self.cvs_and_outdic(vk)
+            if len(odic) == 0:
+                for v in cvs:
+                    grps.pop(v, None)
+            elif cvs:
+                for v in cvs:
+                    grps[v] = VKlause(vk.kname, odic)
+            else:  # cvs == None
+                for v in grps:
+                    grps[v][vk.kname] = vk
+        return grps
+
     def vary_1bit(self, val, bits, cvs=None):
         if cvs == None:
             cvs = []
@@ -50,11 +65,15 @@ class BitGrid:
                 cvs = self.vary_1bit(v, g)  # TB verified
             return cvs, None
 
-        ovk = VKlause(vk.kname, out_dic)
-        if odic_ln != vk.nob and odic_ln < 3:
+        # ovk = VKlause(vk.kname, out_dic)
+        if odic_ln == 3:
+            raise Exception("vk3!")
+
+        if odic_ln != vk.nob:
             # get values of all possible settings of untouched bits in g
             cvs = self.vary_1bit(v, g)
             cvs.sort()
         # else: # in case of len(out_dic) == 3
         # cvs remains None, ovk is a vk3 (untouched by grid-bits)
-        return cvs, ovk
+        # return cvs, ovk
+        return cvs, out_dic
