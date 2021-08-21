@@ -20,6 +20,7 @@ class SatNode:
             self.nov = Center.maxnov
         self.sh = sh
         self.vkm = vkm
+        Center.snodes[self.nov] = self
         # holds the best-covering-vks from vkm.vkdic
         self.bvks = []
         self.next = None
@@ -29,8 +30,6 @@ class SatNode:
         self.next_sh = self.sh.reduce(self.choice["bits"])
         self.bitgrid = BitGrid(self)
         self.split_vkm()
-        # self.prepare()
-        Center.snodes[self.nov] = self
 
     def spawn(self):
         self.chdic = {v: {} for v in self.bitgrid.chheads}

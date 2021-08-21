@@ -11,17 +11,17 @@ class BitGrid:
 
     def find_vkgrps(self, tnode):
         grps = {v: {} for v in self.chheads}
-        for kn, vk in tnode.vmk.vkdic.items():
+        for kn, vk in tnode.vkm.vkdic.items():
             cvs, odic = self.cvs_and_outdic(vk)
             if len(odic) == 0:
                 for v in cvs:
                     grps.pop(v, None)
             elif cvs:
                 for v in cvs:
-                    grps[v] = VKlause(vk.kname, odic)
+                    grps[v] = VKlause(kn, odic)
             else:  # cvs == None
                 for v in grps:
-                    grps[v][vk.kname] = vk
+                    grps[v][kn] = vk
         return grps
 
     def vary_1bit(self, val, bits, cvs=None):
