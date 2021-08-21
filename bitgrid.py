@@ -10,6 +10,30 @@ class BitGrid:
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
     def find_vkgrps(self, tnode):
+        grps = {}
+        for v in self.chheads:
+            grps[v] = tnode.vkm.vkdic.copy()
+        ss = set(self.grids).intersection(set(tnode.vkm.bdic))
+        if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
+            return grps   # every grps[v] has the same copy of vkdic from tnode
+
+        # bit-grid has intersection of bits with tnode.vkm
+        for vk_bit in ss:
+            for kn in tnode.vkm.bdic[vk_bit]:
+                vk = tnode.vkm.vkdic[kn]
+                cvs, odic = self.cvs_and_outdic(vk)
+                for v in self.chheads:
+                    if v in grps:
+                        if v in cvs:
+                            if len(odic):
+                                grps[v][kn] = VKlause(kn, odic)
+                            else:  # odic empty -> vk hit by bit-grid
+                                grps.pop(v)
+                        else:  # for v not in cvs: remove kn/vk
+                            grps[v].pop(kn)
+        return grps
+
+        '''
         grps = {v: {} for v in self.chheads}
         for kn, vk in tnode.vkm.vkdic.items():
             cvs, odic = self.cvs_and_outdic(vk)
@@ -23,6 +47,7 @@ class BitGrid:
                 for v in grps:
                     grps[v][kn] = vk
         return grps
+        '''
 
     def vary_1bit(self, val, bits, cvs):
         if len(bits) == 0:
