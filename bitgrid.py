@@ -16,17 +16,15 @@ class BitGrid:
             if len(odic) == 0:
                 for v in cvs:
                     grps.pop(v, None)
-            elif cvs:
+            elif len(cvs) > 0:
                 for v in cvs:
                     grps[v] = VKlause(kn, odic)
-            else:  # cvs == None
+            else:  # len(cvs) == 0: vk lies totally outside of bit-grid
                 for v in grps:
                     grps[v][kn] = vk
         return grps
 
-    def vary_1bit(self, val, bits, cvs=None):
-        if cvs == None:
-            cvs = []
+    def vary_1bit(self, val, bits, cvs):
         if len(bits) == 0:
             cvs.append(val)
         else:
@@ -41,7 +39,7 @@ class BitGrid:
 
     def cvs_and_outdic(self, vk):
         g = [2, 1, 0]
-        cvs = None
+        cvs = []
         # vk's dic values within self.grid-bits, forming a value in (0..7)
         # example: grids: (16,6,1), vk.dic:{29:0, 16:1, 1:0} has
         # {16:1,1:0} iwithin grid-bits, forming a value of 4/1*0 where
@@ -62,7 +60,7 @@ class BitGrid:
             if vk.nob == 3:   # cvs is a single value, not a list
                 cvs = vk.compressed_value()
             elif vk.nob < 3:  # cvs is a list of values
-                cvs = self.vary_1bit(v, g)  # TB verified
+                cvs = self.vary_1bit(v, g, cvs)  # TB verified
             return cvs, None
 
         # ovk = VKlause(vk.kname, out_dic)
@@ -71,7 +69,7 @@ class BitGrid:
 
         if odic_ln != vk.nob:
             # get values of all possible settings of untouched bits in g
-            cvs = self.vary_1bit(v, g)
+            cvs = self.vary_1bit(v, g, cvs)
             cvs.sort()
         # else: # in case of len(out_dic) == 3
         # cvs remains None, ovk is a vk3 (untouched by grid-bits)

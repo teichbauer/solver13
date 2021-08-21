@@ -40,7 +40,7 @@ class SatNode:
                 elif type(ctnode).__name__ == 'dict':
                     pass
             pass
-        else:
+        elif self.next:
             for v in self.vk2grps:
                 vkm = VK12Manager(self.vk2grps[v])
                 if vkm.valid:
@@ -48,11 +48,13 @@ class SatNode:
                     if self.next:
                         tnode.vkgrps = self.next.bitgrid.find_vkgrps(tnode)
                     self.chdic[v] = tnode
-            pass
-        if self.done:
-            return Center.sats
-        else:
             return self.next.spawn()
+        else:
+            self.solve()
+            return Center.sats
+
+    def solve(self):
+        pass
 
     # def prepare(self):
     #     self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
@@ -81,10 +83,12 @@ class SatNode:
                     s.add(rvk)
                 if kn not in self.vk12dic:
                     self.vk12dic[kn] = rvk
-        self.vk2grps = {v: {} for v in tdic}
-        for v in tdic:
-            for vk2 in tdic[v]:
-                self.vk2grps[v][vk2.kname] = vk2
+        self.vk2grps = {}
+        for v in self.bitgrid.chheads:
+            if v in tdic:
+                d = self.vk2grps.setdefault(v, {})
+                for vk2 in tdic[v]:
+                    d[vk2.kname] = vk2
 
         if len(self.vkm.vkdic) == 0:
             self.done = True
