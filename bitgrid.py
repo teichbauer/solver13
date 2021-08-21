@@ -16,17 +16,27 @@ class BitGrid:
         ss = set(self.grids).intersection(set(tnode.vkm.bdic))
         if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
             return grps   # every grps[v] has the same copy of vkdic from tnode
-
         # bit-grid has intersection of bits with tnode.vkm
+
+        # a kn/vk needs to be handled only once. If a kn has been handled
+        handled_kns = []  # it can then be jumped over
         for vk_bit in ss:
             for kn in tnode.vkm.bdic[vk_bit]:
+                if kn in handled_kns:
+                    continue
+                else:
+                    handled_kns.append(kn)
                 vk = tnode.vkm.vkdic[kn]
                 cvs, odic = self.cvs_and_outdic(vk)
+                if len(odic):
+                    new_vk = VKlause(kn, odic)
+                else:
+                    new_vk = None
                 for v in self.chheads:
                     if v in grps:
                         if v in cvs:
-                            if len(odic):
-                                grps[v][kn] = VKlause(kn, odic)
+                            if new_vk:
+                                grps[v][kn] = new_vk
                             else:  # odic empty -> vk hit by bit-grid
                                 grps.pop(v)
                         else:  # for v not in cvs: remove kn/vk
