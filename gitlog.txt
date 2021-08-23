@@ -1,3 +1,5 @@
+2021-08-23->0.241
+- testing snode/spawn and more
 2021-08-21->0.240
 - fix bitgrid/find_vkgrps
 2021-08-21->0.239

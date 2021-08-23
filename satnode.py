@@ -32,40 +32,43 @@ class SatNode:
         self.split_vkm()
 
     def spawn(self):
-        self.chdic = {v: {} for v in self.bitgrid.chheads}
-        if self.parent:
-            for pv, ctnode in self.parent.chdic.items():
-                if type(ctnode).__name__ == 'TNode':
-                    pass
-                elif type(ctnode).__name__ == 'dict':
-                    pass
-            pass
-        elif self.next:
-            for v in self.vk2grps:
-                vkm = VK12Manager(self.vk2grps[v])
-                if vkm.valid:
-                    tnode = TNode(vkm, self, f"{self.nov}.{v}")
-                    if self.next:
-                        tnode.vkgrps = self.next.bitgrid.find_vkgrps(tnode)
-                    self.chdic[v] = tnode
-            return self.next.spawn()
-        else:
+        self.chdic = {}
+        if not self.next:
             self.solve()
             return Center.sats
 
+        for gv in self.vk2grps:
+            vkm = VK12Manager(self.vk2grps[gv])
+            if not vkm.valid:
+                continue
+
+            if self.parent:
+                for pv, ptnode in self.parent.chdic.items():
+                    if type(ptnode).__name__ == 'TNode':
+                        for v, vkd in ptnode.grps.items():
+                            vkmx = vkm.clone()
+                            vkmx.add_vkdic(vkd)
+                            if vkmx.valid:
+                                tnname = f"{self.nov}.{gv}-" + ptnode.name
+                                dic = self.chdic.setdefault(gv, {})
+                                tn = TNode(vkmx, self, tnname)
+                                dic[tnname] = tn
+                                if self.next:
+                                    tn.grps = \
+                                        self.next.bitgrid.find_tnode_vkgrps(tn)
+                    elif type(ptnode).__name__ == 'dict':
+                        for ky, tnd in ptnode.items():
+                            pass
+                x = 1
+            else:
+                tnode = TNode(vkm, self, f"{self.nov}.{gv}")
+                if self.next:
+                    tnode.grps = self.next.bitgrid.find_tnode_vkgrps(tnode)
+                    self.chdic[gv] = tnode
+        self.next.spawn()
+
     def solve(self):
         pass
-
-    # def prepare(self):
-    #     self.chdic = self.vkm.morph(self)  # next_vkm: all vk3s
-    #     if self.nov == 24:
-    #         Center.save_pathdic('path-info.json')
-
-    #     if self.done:
-    #         for nov, sn in Center.snodes.items():
-    #             pass
-
-    # end of def prepare(self):
 
     def split_vkm(self):
         # pop-out touched-vk3s forming vk12dic with them
