@@ -13,12 +13,12 @@ class TNode:
         self.vkm = vk12m
         # self.vkm = VK12Manager(vk12dic)
 
-    def approve(self, sn):  # next/lower snode, with its bitgrid
+    def approve(self, sn):  # next/lower snode, with its bit-grid
         # grid is bitgrid of next(lower snode)
         """for the grid of next(lower) level snode, do
         1.
         """
-        gd = sn.bitgrid
+        gd = sn.bgrid
         vkmdic = {}
         for k in gd.chheads:  # setup empty vk12ms for every ch-tnode
             vkmdic[k] = VK12Manager()
@@ -46,9 +46,6 @@ class TNode:
                         if not vkmdic[cv].valid:
                             del vkmdic[cv]
         return {v: TNode(vkm, sn, v) for v, vkm in vkmdic.items()}
-
-    def spawn(self, starting_vkm):
-        pass
 
     def check_sat(self, sdic):
         vk12dic = {}

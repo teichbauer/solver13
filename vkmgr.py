@@ -38,7 +38,7 @@ class VKManager:
 
     def morph(self, sn):
         vk2grps = sn.split_vkm()  # dic of  vkms keyed by chhead of sn
-        pthdic = {v: {} for v in sn.bitgrid.chheads}
+        pthdic = {v: {} for v in sn.bgrid.chheads}
         if sn.parent:
             for pv, ctnode in sn.parent.chdic.items():
                 if type(ctnode).__name__ == 'TNode':

@@ -9,7 +9,7 @@ class BitGrid:
         self.covers = tuple(vk.compressed_value() for vk in snode.bvks)
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
-    def find_tnode_vkgrps(self, tnode):
+    def tn_grps(self, tnode):
         #
         #
         grps = {}

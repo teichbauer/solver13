@@ -28,7 +28,7 @@ class SatNode:
         self.choice = choice
         self.bvks = tuple(vkm.pop_vk(vk.kname) for vk in choice["ancvks"])
         self.next_sh = self.sh.reduce(self.choice["bits"])
-        self.bitgrid = BitGrid(self)
+        self.bgrid = BitGrid(self)
         self.split_vkm()
 
     def spawn(self):
@@ -43,40 +43,34 @@ class SatNode:
                 continue
 
             if self.parent:
+                dic = self.chdic.setdefault(gv, {})
+                name0 = f"{self.nov}.{gv}-"
                 for pv, ptnode in self.parent.chdic.items():
                     if type(ptnode).__name__ == 'TNode':
-                        for v, vkd in ptnode.grps.items():
+                        if gv in ptnode.grps:
                             vkmx = vkm.clone()
-                            vkmx.add_vkdic(vkd)
-                            if vkmx.valid:
-                                tnname = f"{self.nov}.{gv}-" + ptnode.name
-                                dic = self.chdic.setdefault(gv, {})
+                            if vkmx.add_vkdic(ptnode.grps[gv]):
+                                tnname = name0 + ptnode.name
                                 tn = TNode(vkmx, self, tnname)
                                 dic[tnname] = tn
                                 if self.next:
-                                    tn.grps = \
-                                        self.next.bitgrid.find_tnode_vkgrps(tn)
+                                    tn.grps = self.next.bgrid.tn_grps(tn)
                     elif type(ptnode).__name__ == 'dict':
                         for ky, tnd in ptnode.items():
-                            for v, vkd in tnd.grps.items():
+                            if gv in tnd.grps:
                                 vkmx = vkm.clone()
-                                vkmx.add_vkdic(vkd)
-                                if vkmx.valid:
-                                    tnname = f"{self.nov}.{gv}-" + ky
-                                    dic = self.chdic.setdefault(gv, {})
+                                if vkmx.add_vkdic(tnd.grps[gv]):
+                                    tnname = name0 + ky
                                     tn = TNode(vkmx, self, tnname)
                                     dic[tnname] = tn
                                     if self.next:
-                                        tn.grps = self.next.bitgrid\
-                                            .find_tnode_vkgrps(tn)
-
-                x = 1
+                                        tn.grps = self.next.bgrid.tn_grps(tn)
             else:
                 tnode = TNode(vkm, self, f"{self.nov}.{gv}")
                 if self.next:
-                    tnode.grps = self.next.bitgrid.find_tnode_vkgrps(tnode)
+                    tnode.grps = self.next.bgrid.tn_grps(tnode)
                     self.chdic[gv] = tnode
-        self.next.spawn()
+        return self.next.spawn()
 
     def solve(self):
         pass
@@ -89,16 +83,16 @@ class SatNode:
         tdic = {}
         for kn in self.choice['touched']:
             vk = self.vkm.pop_vk(kn)
-            cvs, outdic = self.bitgrid.cvs_and_outdic(vk)
+            cvs, outdic = self.bgrid.cvs_and_outdic(vk)
             rvk = VKlause(vk.kname, outdic)
             for v in cvs:
-                if v not in self.bitgrid.covers:
+                if v not in self.bgrid.covers:
                     s = tdic.setdefault(v, set([]))
                     s.add(rvk)
                 if kn not in self.vk12dic:
                     self.vk12dic[kn] = rvk
         self.vk2grps = {}
-        for v in self.bitgrid.chheads:
+        for v in self.bgrid.chheads:
             if v in tdic:
                 d = self.vk2grps.setdefault(v, {})
                 for vk2 in tdic[v]:
@@ -111,6 +105,7 @@ class SatNode:
             self.next_choice = self.vkm.choose_anchor()
             self.next = SatNode(
                 self, self.next_sh.clone(), self.vkm, self.next_choice)
+    # ---- def split_vkm(self) --------
 
     def make_paths(self):
         if not self.parent:  # do nothing for top-level snode

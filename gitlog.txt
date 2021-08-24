@@ -1,3 +1,7 @@
+2021-08-24->0.243
+- fix in snode.
+- minor change in vk12mgr
+- polishing names in bitgrid
 2021-08-23->0.242
 - progress
 2021-08-23->0.241

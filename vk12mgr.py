@@ -44,7 +44,7 @@ class VK12Manager:
         for vk in vkdic.values():
             self.add_vk(vk)
             if not self.valid:
-                break
+                return False
         return self.valid
 
     def add_vk(self, vk):
