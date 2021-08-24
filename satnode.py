@@ -58,7 +58,18 @@ class SatNode:
                                         self.next.bitgrid.find_tnode_vkgrps(tn)
                     elif type(ptnode).__name__ == 'dict':
                         for ky, tnd in ptnode.items():
-                            pass
+                            for v, vkd in tnd.grps.items():
+                                vkmx = vkm.clone()
+                                vkmx.add_vkdic(vkd)
+                                if vkmx.valid:
+                                    tnname = f"{self.nov}.{gv}-" + ky
+                                    dic = self.chdic.setdefault(gv, {})
+                                    tn = TNode(vkmx, self, tnname)
+                                    dic[tnname] = tn
+                                    if self.next:
+                                        tn.grps = self.next.bitgrid\
+                                            .find_tnode_vkgrps(tn)
+
                 x = 1
             else:
                 tnode = TNode(vkm, self, f"{self.nov}.{gv}")

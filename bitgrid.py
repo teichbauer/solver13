@@ -30,7 +30,7 @@ class BitGrid:
                     handled_kns.append(kn)
                 vk = tnode.vkm.vkdic[kn]
                 cvs, odic = self.cvs_and_outdic(vk)
-                if len(odic):
+                if odic and len(odic):
                     new_vk = VKlause(kn, odic)
                 else:
                     new_vk = None

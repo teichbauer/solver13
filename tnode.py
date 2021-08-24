@@ -47,6 +47,9 @@ class TNode:
                             del vkmdic[cv]
         return {v: TNode(vkm, sn, v) for v, vkm in vkmdic.items()}
 
+    def spawn(self, starting_vkm):
+        pass
+
     def check_sat(self, sdic):
         vk12dic = {}
         for kn, vk in self.vkm.vkdic.items():
