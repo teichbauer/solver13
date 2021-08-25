@@ -32,7 +32,7 @@ class Node2:
         tbit = sorted(self.vkm.bdic.keys())[-1]  # take highst bit at the end
         # take a vk2 with top bit
         self.bvk = self.vkm.remove_vk2(self.vkm.bdic[tbit][0])
-        self.crvs = set([self.bvk.compressed_value()])
+        self.crvs = set([self.bvk.cmprssd_value()])
         sh = self.sh.clone().drop_vars(self.bvk.bits)
         ssat = {**self.sat, **{self.bvk.bits[0]: 0, self.bvk.bits[1]: 0}}
         self.vsdic = {
@@ -83,7 +83,7 @@ class Node2:
             '''
         cvs = []
         if vk.bits == self.bvk.bits:
-            cvs.append(vk.compressed_value())
+            cvs.append(vk.cmprssd_value())
             return tuple(cvs), None
         bvk_bset = set(self.bvk.bits)
         sbit = bvk_bset.intersection(vk.bits).pop()

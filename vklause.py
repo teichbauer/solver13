@@ -54,7 +54,7 @@ class VKlause:
             return VKlause(self.kname, d, nov)
         return None
 
-    def compressed_value(self, ref_bits=None):
+    def cmprssd_value(self, ref_bits=None):
         ''' compress to 3 bits: [2,1,0] keep the order. get bin-value.
         example: {6:1,4:1,0:0} -> 6(110), {9:0,5:1,1:1} -> 3(011) '''
         if ref_bits:  # ref-bits: [16,6,1]

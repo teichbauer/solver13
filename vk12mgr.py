@@ -215,7 +215,7 @@ class VK12Manager:
             out_bits = set(bs) - set(n12.sh.varray)
             if len(out_bits) == 0:
                 if vk.nob == n12.sh.ln:
-                    excl_cvs.add(vk.compressed_value())
+                    excl_cvs.add(vk.cmprssd_value())
                 elif vk.hit(n12.hsat):
                     raise Exception(f"Wrong vk: {vk.kname}")
                 else:

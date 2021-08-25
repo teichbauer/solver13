@@ -6,12 +6,10 @@ class BitGrid:
     def __init__(self, snode):  # grid_bits):
         # grid-bits: high -> low, descending order
         self.grids = tuple(reversed(snode.choice["bits"]))  # bits
-        self.covers = tuple(vk.compressed_value() for vk in snode.bvks)
+        self.covers = tuple(vk.cmprssd_value() for vk in snode.choice["avks"])
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
     def tn_grps(self, tnode):
-        #
-        #
         grps = {}
         for v in self.chheads:
             grps[v] = tnode.vkm.vkdic.copy()
@@ -19,7 +17,6 @@ class BitGrid:
         if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
             return grps  # every grps[v] has the same copy of vkdic from tnode
         # bit-grid has intersection of bits with tnode.vkm
-
         # a kn/vk needs to be handled only once. If a kn has been handled
         handled_kns = []  # it can then be jumped over
         for vk_bit in ss:
@@ -43,6 +40,32 @@ class BitGrid:
                                 grps.pop(v)
                         else:  # for v not in cvs: remove kn/vk
                             grps[v].pop(kn)
+        return grps
+
+    def tn_grps0(self, tnode):
+        grps = {}
+        for v in self.chheads:
+            grps[v] = tnode.vkm.vkdic.copy()
+        ss = set(self.grids).intersection(set(tnode.vkm.bdic))
+        if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
+            return grps  # every grps[v] has the same copy of vkdic from tnode
+        # bit-grid has intersection of bits with tnode.vkm
+        # a kn/vk needs to be handled only once. If a kn has been handled
+        handled_kns = []  # it can then be jumped over
+        for vk_bit in ss:
+            for kn in tnode.vkm.bdic[vk_bit]:
+                if kn in handled_kns:
+                    continue
+                else:
+                    handled_kns.append(kn)
+                cvs, odic = self.cvs_and_outdic(tnode.vkm.vkdic[kn])
+                if (kn in tnode.vkm.kn1s) or len(odic) == 0:
+                    for v in cvs:
+                        grps.pop(v, None)
+                else:  # vk2 with 1 bit in 1 bit out of grid
+                    new_vk = VKlause(kn, odic)
+                    for v in cvs:
+                        grps[v][kn] = new_vk
         return grps
 
     def vary_1bit(self, val, bits, cvs):
@@ -79,7 +102,7 @@ class BitGrid:
         if odic_ln == 0:  # vk is covered by grid-3 bits totally
             # there is no rvk (None)
             if vk.nob == 3:   # cvs is a single value, not a list
-                cvs = vk.compressed_value()
+                cvs = vk.cmprssd_value()
             elif vk.nob < 3:  # cvs is a list of values
                 cvs = self.vary_1bit(v, g, cvs)  # TB verified
             return cvs, None

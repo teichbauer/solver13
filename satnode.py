@@ -3,7 +3,6 @@ from vklause import VKlause
 from vk12mgr import VK12Manager
 from basics import get_bit
 from tnode import TNode
-from pathmgr import PathManager
 from bitgrid import BitGrid
 from center import Center
 
@@ -21,12 +20,9 @@ class SatNode:
         self.sh = sh
         self.vkm = vkm
         Center.snodes[self.nov] = self
-        # holds the best-covering-vks from vkm.vkdic
-        self.bvks = []
         self.next = None
         self.done = False
         self.choice = choice
-        self.bvks = tuple(vkm.pop_vk(vk.kname) for vk in choice["ancvks"])
         self.next_sh = self.sh.reduce(self.choice["bits"])
         self.bgrid = BitGrid(self)
         self.split_vkm()
@@ -55,6 +51,8 @@ class SatNode:
                                 dic[tnname] = tn
                                 if self.next:
                                     tn.grps = self.next.bgrid.tn_grps(tn)
+                                    grps = self.next.bgrid.tn_grps0(tn)
+                                    x = 1
                     elif type(ptnode).__name__ == 'dict':
                         for ky, tnd in ptnode.items():
                             if gv in tnd.grps:
@@ -65,15 +63,21 @@ class SatNode:
                                     dic[tnname] = tn
                                     if self.next:
                                         tn.grps = self.next.bgrid.tn_grps(tn)
+                                        grps = self.next.bgrid.tn_grps0(tn)
+                                        x = 1
             else:
                 tnode = TNode(vkm, self, f"{self.nov}.{gv}")
                 if self.next:
                     tnode.grps = self.next.bgrid.tn_grps(tnode)
+                    grps = self.next.bgrid.tn_grps0(tn)
+                    x = 1
+
                     self.chdic[gv] = tnode
+        Center.add_path_tnodes(self.chdic)
         return self.next.spawn()
 
     def solve(self):
-        pass
+        Center.save_pathdic('path-fino1.json')
 
     def split_vkm(self):
         # pop-out touched-vk3s forming vk12dic with them
@@ -106,46 +110,6 @@ class SatNode:
             self.next = SatNode(
                 self, self.next_sh.clone(), self.vkm, self.next_choice)
     # ---- def split_vkm(self) --------
-
-    def make_paths(self):
-        if not self.parent:  # do nothing for top-level snode
-            return
-        # collect higher-chs, and the ones being refed by this snode
-        higher_vals_inuse = set([])
-        dels = []  # for collecting tnode with no path
-        for val, tnode in self.chdic.items():
-            tnode.pthmgr = PathManager(tnode, self.done)
-            if len(tnode.pthmgr.dic) == 0:
-                dels.append(tnode)
-            else:
-                high_vals = [int(k[1].split(".")[1]) for k in tnode.pthmgr.dic]
-                higher_vals_inuse.update(high_vals)
-        # clean-up ch-tnodes, if its pthmgr.dic is empty
-        for tnode in dels:
-            # TBD: tnode.val?
-            # self.chdic.pop(tnode.val)
-            Center.repo.pop(tnode.name, None)
-        self.done = len(self.chdic) == 0
-        # clean-up higher-chs not being used by any tnode
-        self.parent.trim_chs(higher_vals_inuse)
-
-    def trim_chs(self, used_vals):
-        """the chdic keys not in used_vals(a set), will be deleted. if this
-        changs used val-set of parent level, recursiv-call on parent"""
-        s = set(self.chdic.keys())
-        if s != used_vals:
-            delta = s - used_vals
-            for v in delta:
-                tn = self.chdic.pop(v, None)
-                if tn:
-                    Center.repo.pop(tn.name, None)
-            if self.parent:
-                # recursive call of parent.trim_chs
-                higher_vals_inuse = set([])
-                for tn in self.chdic.values():
-                    vs = [int(k[1].split(".")[1]) for k in tn.pthmgr.dic]
-                    higher_vals_inuse.update(vs)
-                self.parent.trim_chs(higher_vals_inuse)
 
     def is_top(self):
         return self.nov == Center.maxnov
