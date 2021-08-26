@@ -6,6 +6,7 @@ class BitGrid:
     def __init__(self, snode):  # grid_bits):
         # grid-bits: high -> low, descending order
         self.grids = tuple(reversed(snode.choice["bits"]))  # bits
+        self.bitset = set(snode.choice["bits"])
         self.covers = tuple(vk.cmprssd_value() for vk in snode.choice["avks"])
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
@@ -13,7 +14,7 @@ class BitGrid:
         grps = {}
         for v in self.chheads:
             grps[v] = tnode.vkm.vkdic.copy()
-        ss = set(self.grids).intersection(set(tnode.vkm.bdic))
+        ss = self.bitset.intersection(tnode.vkm.bdic)
         if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
             return grps  # every grps[v] has the same copy of vkdic from tnode
         # bit-grid has intersection of bits with tnode.vkm
@@ -46,7 +47,7 @@ class BitGrid:
         grps = {}
         for v in self.chheads:
             grps[v] = tnode.vkm.vkdic.copy()
-        ss = set(self.grids).intersection(set(tnode.vkm.bdic))
+        ss = self.bitset.intersection(tnode.vkm.bdic)
         if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
             return grps  # every grps[v] has the same copy of vkdic from tnode
         # bit-grid has intersection of bits with tnode.vkm

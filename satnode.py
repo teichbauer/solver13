@@ -1,7 +1,6 @@
 # from typing_extensions import ParamSpecKwargs
 from vklause import VKlause
 from vk12mgr import VK12Manager
-from basics import get_bit
 from tnode import TNode
 from bitgrid import BitGrid
 from center import Center
@@ -104,12 +103,9 @@ class SatNode:
 
         if len(self.vkm.vkdic) == 0:
             self.done = True
-            self.next_choice = None
         else:
-            self.next_choice = self.vkm.choose_anchor()
-            self.next = SatNode(
-                self, self.next_sh.clone(), self.vkm, self.next_choice)
+            self.next = SatNode(self,
+                                self.next_sh.clone(),
+                                self.vkm,
+                                self.self.vkm.make_choice())
     # ---- def split_vkm(self) --------
-
-    def is_top(self):
-        return self.nov == Center.maxnov

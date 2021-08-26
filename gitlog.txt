@@ -1,3 +1,7 @@
+2021-08-26->0.245
+- add bitset in BitGrid - simplifying set-intersection calls
+- fix missing of popping avks from choice, get rid of next_choice, is_top
+- vkmgr: choose_anchor -> make_choice, pop avks from vkdic into choice['avks']
 2021-08-25->0.244
 - get rid of PathManager class and pathngr.py
 - get rid of tnode/approve
@@ -132,7 +136,7 @@
 - SatNode offers a class var, collecting all anchor-vks, keyed by nov
 - tnode has a add_ancvks to use SatNode.anchor_vks
 - vklause.clone offers an option to drop bit
-- rename vkmgr/bestchoice to choose_anchor, bestkey -> ancs
+- rename vkmgr/bestchoice to make_choice, bestkey -> ancs
 2021-04-12->0.200
 - simplifying: list(sorted(list(d.keys()), reverse=True)) simplified to be:
   sorted(d.keys(), reverse=True), in many places.
