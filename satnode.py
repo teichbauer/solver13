@@ -6,6 +6,18 @@ from bitgrid import BitGrid
 from center import Center
 
 
+# def compare_grps(d1, d2):
+#     if d1.keys() != d2.keys():
+#         return False
+#     for k in d1:
+#         if d1[k].keys() != d2[k].keys():
+#             return False
+#         for kk in d1[k]:
+#             if not d1[k][kk].equals(d2[k][kk]):
+#                 return False
+#     return True
+
+
 class SatNode:
     debug = False
     # debug = True
@@ -50,8 +62,6 @@ class SatNode:
                                 dic[tnname] = tn
                                 if self.next:
                                     tn.grps = self.next.bgrid.tn_grps(tn)
-                                    grps = self.next.bgrid.tn_grps0(tn)
-                                    x = 1
                     elif type(ptnode).__name__ == 'dict':
                         for ky, tnd in ptnode.items():
                             if gv in tnd.grps:
@@ -62,14 +72,10 @@ class SatNode:
                                     dic[tnname] = tn
                                     if self.next:
                                         tn.grps = self.next.bgrid.tn_grps(tn)
-                                        grps = self.next.bgrid.tn_grps0(tn)
-                                        x = 1
             else:
                 tnode = TNode(vkm, self, f"{self.nov}.{gv}")
                 if self.next:
                     tnode.grps = self.next.bgrid.tn_grps(tnode)
-                    grps = self.next.bgrid.tn_grps0(tn)
-                    x = 1
 
                     self.chdic[gv] = tnode
         Center.add_path_tnodes(self.chdic)
@@ -107,5 +113,5 @@ class SatNode:
             self.next = SatNode(self,
                                 self.next_sh.clone(),
                                 self.vkm,
-                                self.self.vkm.make_choice())
+                                self.vkm.make_choice())
     # ---- def split_vkm(self) --------

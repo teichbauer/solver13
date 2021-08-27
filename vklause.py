@@ -144,3 +144,11 @@ class VKlause:
         else:
             vk12 = VKlause(self.kname, td)
         return total_hit, vk12
+
+    def equals(self, vk):
+        if self.bits != vk.bits:
+            return False
+        for b in self.bits:
+            if self.dic[b] != vk.dic[b]:
+                return False
+        return True

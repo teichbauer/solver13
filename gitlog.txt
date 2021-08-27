@@ -1,3 +1,7 @@
+2021-08-26->0.246
+- tested BitGrid/tn_grps0 with new coding: it has the same output as tn_grps
+  replace tn_grps with it.
+- vklause has a new method: .equals
 2021-08-26->0.245
 - add bitset in BitGrid - simplifying set-intersection calls
 - fix missing of popping avks from choice, get rid of next_choice, is_top
