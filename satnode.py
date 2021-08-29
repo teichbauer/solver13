@@ -40,7 +40,7 @@ class SatNode:
     def spawn(self):
         self.chdic = {}
         if not self.next:
-            self.solve()
+            self.solve(self.parent.chdic)
             return Center.sats
 
         # for gv in self.vk2grps:
@@ -81,7 +81,12 @@ class SatNode:
         Center.add_path_tnodes(self.chdic)
         return self.next.spawn()
 
-    def solve(self):
+    def solve(self, pathdic):
+        for v, tndic in pathdic.items():
+            if len(tndic) == 0:
+                continue
+            for name, tn in tndic.items():
+                tn.get_sats()
         Center.save_pathdic('path-fino1.json')
 
     def split_vkm(self):
@@ -94,6 +99,7 @@ class SatNode:
                restriction(restrictive vk2) on this ch-head/value.
             3. make next-choice from vkm - if not empty, if it is empty,no .next
             '''
+        self.vk12dic = {}
         tdic = {}
         for kn in self.choice['touched']:
             vk = self.vkm.pop_vk(kn)

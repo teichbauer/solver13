@@ -1,3 +1,6 @@
+2021-08-29->0.248
+- tested 0.248
+- tnode.get_sats set-up
 2021-08-29->0.247
 - get rid of snode.done. .next == None means the same
 - there is an issue on sn.24, where its vk2grps only has (as ch-value key)
