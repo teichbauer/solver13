@@ -12,16 +12,6 @@ class TNode:
         self.vkm = vk12m
         # self.vkm = VK12Manager(vk12dic)
 
-    def check_sat(self, sdic):
-        vk12dic = {}
-        for kn, vk in self.vkm.vkdic.items():
-            total_hit, vk12 = vk.partial_hit_residue(sdic)
-            if total_hit:
-                return None
-            elif vk12:
-                vk12dic[kn] = vk12
-        return vk12dic
-
     def find_path_vk12m(self, pnode_leftover_vk12dic):
         vk12m = self.vkm.clone()  # use a clone, don't touch self.vkm.vks
         # if not self.add_ancvks(vk12m):

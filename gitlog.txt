@@ -1,3 +1,13 @@
+2021-08-29->0.247
+- get rid of snode.done. .next == None means the same
+- there is an issue on sn.24, where its vk2grps only has (as ch-value key)
+  {2:..,3:..,7:..}. But it parent sn.27 has 4 tnodes, with tnode.grps = {5:..}
+  with previous snode.spawn, the outer loop run thru self.vk2grps, here the 5
+  will not hit, so resulting no child-tnode.
+  Now, for the semantics of snode.vk2grsps: if it misses a ch-value (as in 
+  self.bgrid/chheads), doesn't mean this value is not yielding, but rather in 
+  the opposite: this value has no restrictive vk2 for it.
+  So I should loop thru bgrid.chheadsm, not vk2grps
 2021-08-26->0.246
 - tested BitGrid/tn_grps0 with new coding: it has the same output as tn_grps
   replace tn_grps with it.

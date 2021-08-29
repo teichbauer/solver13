@@ -45,18 +45,9 @@ class VKlause:
         else:
             return None
 
-    def clone_tail(self, tailbits, nov):
-        d = {}
-        for b, v in self.dic.items():
-            if b in tail_sat:
-                d[b] = v
-        if len(d) > 0:
-            return VKlause(self.kname, d, nov)
-        return None
-
     def cmprssd_value(self, ref_bits=None):
         ''' compress to 3 bits: [2,1,0] keep the order. get bin-value.
-        example: {6:1,4:1,0:0} -> 6(110), {9:0,5:1,1:1} -> 3(011) '''
+            example: {6:1,4:1,0:0} -> 6(110), {9:0,5:1,1:1} -> 3(011) '''
         if ref_bits:  # ref-bits: [16,6,1]
             cvs = []
             sbits = set(ref_bits).intersection(self.bits)

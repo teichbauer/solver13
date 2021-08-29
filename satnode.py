@@ -32,7 +32,6 @@ class SatNode:
         self.vkm = vkm
         Center.snodes[self.nov] = self
         self.next = None
-        self.done = False
         self.choice = choice
         self.next_sh = self.sh.reduce(self.choice["bits"])
         self.bgrid = BitGrid(self)
@@ -44,8 +43,9 @@ class SatNode:
             self.solve()
             return Center.sats
 
-        for gv in self.vk2grps:
-            vkm = VK12Manager(self.vk2grps[gv])
+        # for gv in self.vk2grps:
+        for gv in self.bgrid.chheads:
+            vkm = VK12Manager(self.vk2grps.get(gv, None))
             if not vkm.valid:
                 continue
 
@@ -85,10 +85,15 @@ class SatNode:
         Center.save_pathdic('path-fino1.json')
 
     def split_vkm(self):
-        # pop-out touched-vk3s forming vk12dic with them
-        # tdic: keyed by cvs of vks and values are lists of vks
-        # make next-choice from vkm - if not empty, if it is empty, done=True
-        self.vk12dic = {}  # store all vk12s, all tnode's vkdic ref to here
+        ''' 1. pop-out touched-vk3s forming vk12dic with them
+            2. tdic: keyed by cvs of vks and values are lists of vks
+               this results in self.vk2grps dict, keyed by the possible 
+               grid-values(bgrid/chheads), vkdics restricting the value
+               if vk2grps misses a chhead-value, that doesn't mean, this value
+               if not allowed - quite the opposite: This means that there is no
+               restriction(restrictive vk2) on this ch-head/value.
+            3. make next-choice from vkm - if not empty, if it is empty,no .next
+            '''
         tdic = {}
         for kn in self.choice['touched']:
             vk = self.vkm.pop_vk(kn)
@@ -107,9 +112,7 @@ class SatNode:
                 for vk2 in tdic[v]:
                     d[vk2.kname] = vk2
 
-        if len(self.vkm.vkdic) == 0:
-            self.done = True
-        else:
+        if len(self.vkm.vkdic) > 0:
             self.next = SatNode(self,
                                 self.next_sh.clone(),
                                 self.vkm,
