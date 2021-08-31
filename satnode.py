@@ -6,18 +6,6 @@ from bitgrid import BitGrid
 from center import Center
 
 
-# def compare_grps(d1, d2):
-#     if d1.keys() != d2.keys():
-#         return False
-#     for k in d1:
-#         if d1[k].keys() != d2[k].keys():
-#             return False
-#         for kk in d1[k]:
-#             if not d1[k][kk].equals(d2[k][kk]):
-#                 return False
-#     return True
-
-
 class SatNode:
     debug = False
     # debug = True
@@ -32,16 +20,18 @@ class SatNode:
         self.vkm = vkm
         Center.snodes[self.nov] = self
         self.next = None
-        self.choice = choice
-        self.next_sh = self.sh.reduce(self.choice["bits"])
-        self.bgrid = BitGrid(self)
+        self.touched = choice['touched']
+        self.next_sh = self.sh.reduce(choice["bits"])
+        self.bgrid = BitGrid(choice)
         self.split_vkm()
 
     def spawn(self):
         self.chdic = {}
         if not self.next:
-            self.solve(self.parent.chdic)
-            return Center.sats
+            return self.solve()
+
+        Center.satbits.update(self.bgrid.bitset)
+        Center.bits = Center.bits - self.bgrid.bitset
 
         # for gv in self.vk2grps:
         for gv in self.bgrid.chheads:
@@ -81,16 +71,17 @@ class SatNode:
         Center.add_path_tnodes(self.chdic)
         return self.next.spawn()
 
-    def solve(self, pathdic):
-        for v, tndic in pathdic.items():
+    def solve(self):
+        for chv, tndic in self.parent.chdic.items():
             if len(tndic) == 0:
                 continue
             for name, tn in tndic.items():
-                tn.get_sats()
-        Center.save_pathdic('path-fino1.json')
+                tn.get_sats(self.bgrid)
+        # Center.save_pathdic('path-fino1.json')
+        return Center.sats
 
     def split_vkm(self):
-        ''' 1. pop-out touched-vk3s forming vk12dic with them
+        """ 1. pop-out touched-vk3s forming vk12dic with them
             2. tdic: keyed by cvs of vks and values are lists of vks
                this results in self.vk2grps dict, keyed by the possible 
                grid-values(bgrid/chheads), vkdics restricting the value
@@ -98,10 +89,10 @@ class SatNode:
                if not allowed - quite the opposite: This means that there is no
                restriction(restrictive vk2) on this ch-head/value.
             3. make next-choice from vkm - if not empty, if it is empty,no .next
-            '''
+            """
         self.vk12dic = {}
         tdic = {}
-        for kn in self.choice['touched']:
+        for kn in self.touched:
             vk = self.vkm.pop_vk(kn)
             cvs, outdic = self.bgrid.cvs_and_outdic(vk)
             rvk = VKlause(vk.kname, outdic)

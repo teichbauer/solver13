@@ -1,3 +1,9 @@
+2021-08-31->0.249
+- snode no more saves choice: save avks, bits, cvs in bgrid, save self.touched
+- tnode/get_sats calling .get_rsat and .get_nsat 
+- new: Center.bits, Center.satbits
+- vk12m.clone offers deep/shallow clone
+- vklause.hbit_value modified to return b/v pair of the hight-bit
 2021-08-29->0.248
 - tested 0.248
 - tnode.get_sats set-up

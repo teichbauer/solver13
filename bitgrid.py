@@ -3,45 +3,32 @@ from vklause import VKlause
 
 
 class BitGrid:
-    def __init__(self, snode):  # grid_bits):
+    BDICS = {
+        0: {2: 0, 1: 0, 0: 0},
+        1: {2: 0, 1: 0, 0: 1},
+        2: {2: 0, 1: 1, 0: 0},
+        3: {2: 0, 1: 1, 0: 1},
+        4: {2: 1, 1: 0, 0: 0},
+        5: {2: 1, 1: 0, 0: 1},
+        6: {2: 1, 1: 1, 0: 0},
+        7: {2: 1, 1: 1, 0: 1},
+    }
+
+    def __init__(self, choice):  # grid_bits):
         # grid-bits: high -> low, descending order
-        self.grids = tuple(reversed(snode.choice["bits"]))  # bits
-        self.bitset = set(snode.choice["bits"])
-        self.covers = tuple(vk.cmprssd_value() for vk in snode.choice["avks"])
+        self.grids = tuple(reversed(choice["bits"]))  # bits
+        self.bitset = set(choice["bits"])
+        self.avks = choice["avks"]
+        self.covers = tuple(vk.cmprssd_value() for vk in self.avks)
         self.chheads = tuple(v for v in range(8) if v not in self.covers)
 
-    # def tn_grps(self, tnode):
-    #     grps = {}
-    #     for v in self.chheads:
-    #         grps[v] = tnode.vkm.vkdic.copy()
-    #     ss = self.bitset.intersection(tnode.vkm.bdic)
-    #     if len(ss) == 0:  # bit-grid not touched by tnode.vkm.bdic
-    #         return grps  # every grps[v] has the same copy of vkdic from tnode
-    #     # bit-grid has intersection of bits with tnode.vkm
-    #     # a kn/vk needs to be handled only once. If a kn has been handled
-    #     handled_kns = []  # it can then be jumped over
-    #     for vk_bit in ss:
-    #         for kn in tnode.vkm.bdic[vk_bit]:
-    #             if kn in handled_kns:
-    #                 continue
-    #             else:
-    #                 handled_kns.append(kn)
-    #             vk = tnode.vkm.vkdic[kn]
-    #             cvs, odic = self.cvs_and_outdic(vk)
-    #             if odic and len(odic):
-    #                 new_vk = VKlause(kn, odic)
-    #             else:
-    #                 new_vk = None
-    #             for v in self.chheads:
-    #                 if v in grps:
-    #                     if v in cvs:
-    #                         if new_vk:
-    #                             grps[v][kn] = new_vk
-    #                         else:  # odic empty -> vk hit by bit-grid
-    #                             grps.pop(v)
-    #                     else:  # for v not in cvs: remove kn/vk
-    #                         grps[v].pop(kn)
-    #     return grps
+    def violated(self, vkdic):
+        for vk in vkdic.values():
+            pass
+        return False
+
+    def grid_sat(self, val):
+        return {self.grids[b]: v for b, v in self.BDICS[val].items()}
 
     def tn_grps(self, tnode):
         grps = {}

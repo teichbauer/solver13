@@ -20,14 +20,17 @@ class VK12Manager:
         self.kn2s = []
         self.info = []
 
-    def clone(self):
+    def clone(self, deep=True):
         # self.valid must be True. Construct with: no vkdic, raw=True(no reset)
         vk12m = VK12Manager(None, True)
         vk12m.bdic = {k: lst[:] for k, lst in self.bdic.items()}
         vk12m.kn1s = self.kn1s[:]
         vk12m.kn2s = self.kn2s[:]
         vk12m.info = []  # info starts fresh, no taking from self.info
-        vk12m.vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
+        if deep:
+            vk12m.vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
+        else:
+            vk12m.vkdic = self.vkdic.copy()
         return vk12m
 
     def bset(self):

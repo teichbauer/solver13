@@ -1,3 +1,14 @@
+# def compare_grps(d1, d2):
+#     if d1.keys() != d2.keys():
+#         return False
+#     for k in d1:
+#         if d1[k].keys() != d2[k].keys():
+#             return False
+#         for kk in d1[k]:
+#             if not d1[k][kk].equals(d2[k][kk]):
+#                 return False
+#     return True
+
 def verify_sat(vkdic, sat):
     for vk in vkdic.values():
         if vk.hit(sat):

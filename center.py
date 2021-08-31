@@ -3,6 +3,7 @@ import json
 
 class Center:
     maxnov = 0
+    satbits = set([])
     sats = []
     limit = 10
 

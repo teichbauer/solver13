@@ -33,6 +33,7 @@ def process(cnfname):
 def get_vkdic_from_cfg(cfgfile):
     sdic = get_sdic(cfgfile)
     Center.maxnov = sdic["nov"]
+    Center.bits = set(range(Center.maxnov))
     vkdic = make_vkdic(sdic["kdic"])
     return vkdic
 
