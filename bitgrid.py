@@ -16,7 +16,7 @@ class BitGrid:
 
     def __init__(self, choice):  # grid_bits):
         # grid-bits: high -> low, descending order
-        self.grids = tuple(reversed(choice["bits"]))  # bits
+        self.bits = tuple(reversed(choice["bits"]))  # bits
         self.bitset = set(choice["bits"])
         self.avks = choice["avks"]
         self.covers = tuple(vk.cmprssd_value() for vk in self.avks)
@@ -28,7 +28,13 @@ class BitGrid:
         return False
 
     def grid_sat(self, val):
-        return {self.grids[b]: v for b, v in self.BDICS[val].items()}
+        return {self.bits[b]: v for b, v in self.BDICS[val].items()}
+
+    def hit(self, satdic):
+        for avk in self.svks:
+            if avk.hit(satdic):
+                return True
+        return False
 
     def tn_grps(self, tnode):
         grps = {}
@@ -88,8 +94,8 @@ class BitGrid:
         v = 0
         out_dic = {}
         for b in vk.dic:
-            if b in self.grids:
-                ind = self.grids.index(b)  # self.bits: descending order
+            if b in self.bits:
+                ind = self.bits.index(b)  # self.bits: descending order
                 g.remove(ind)
                 v = set_bit(v, ind, vk.dic[b])
             else:

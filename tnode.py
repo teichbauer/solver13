@@ -28,10 +28,6 @@ class TNode:
         for kn in self.vkm.kn1s:
             vk = self.vkm.vkdic[kn]
             b, v = vk.hbit_value()
-            if b in bgrid:
-                for avk in bgrid.avks:
-                    if vk.hit(avk.dic):
-                        return None
             sat0[b] = int(not v)
             rbits.remove(b)
         for kn in self.vkm.kn2s:
@@ -43,8 +39,9 @@ class TNode:
                 for v in (0, 1):
                     sat = sat0.copy()
                     sat[rb] = v
-                    rsats.append(sat)
-        else:
+                    if not bgrid.hit(sat):
+                        rsats.append(sat)
+        elif not bgrid.hit(sat0):
             rsats.append(sat0)
         return rsats
 
