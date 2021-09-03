@@ -1,6 +1,8 @@
-2021-09-01->0.250
-- change bit-grid/grids to bits
-- tnode/get_rsat update
+2021-09-02->0.250
+- new method BitGrid.hit to test if a sat-dic is hit by one of the avks of 
+  this bitgrid
+- tnode/get_sats update
+- now cfg60-266.json performs better: 1.2sec (from 1.72sec)
 2021-08-31->0.249
 - snode no more saves choice: save avks, bits, cvs in bgrid, save self.touched
 - tnode/get_sats calling .get_rsat and .get_nsat 

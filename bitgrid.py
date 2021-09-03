@@ -31,7 +31,7 @@ class BitGrid:
         return {self.bits[b]: v for b, v in self.BDICS[val].items()}
 
     def hit(self, satdic):
-        for avk in self.svks:
+        for avk in self.avks:
             if avk.hit(satdic):
                 return True
         return False

@@ -15,6 +15,7 @@ class VKManager:
         vkdic = {kn: vk.clone() for kn, vk in self.vkdic.items()}
         vkm = VKManager(vkdic)
         vkm.bdic = {b: s.copy() for b, s in self.bdic.items()}
+        return vkm
 
     def pop_vk(self, kn):
         vk = self.vkdic.pop(kn)

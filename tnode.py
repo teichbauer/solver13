@@ -48,10 +48,9 @@ class TNode:
     def get_sats(self, last_bgrid):
         sats = []
         rsats = self.get_rsats(last_bgrid)
+        nsat = self.get_nsat()
         if len(rsats) > 0:
-            nsat = self.get_nsat()
             for sat in rsats:
-                tdic = sat.copy()
-                tdic.update(nsat)
-                sats.append(tdic)
+                sat.update(nsat)
+                sats.append(sat)
         Center.sats += sats
