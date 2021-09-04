@@ -42,8 +42,15 @@ class BitGrid:
         cvs_set = set(self.chheads)
         kns = vk12m.kn1s + vk12m.kn2s
         for kn in kns:
-            if self.bitset.issuperset(vk12m.vkdic[kn].bits):
-                pass
+            vk = vk12m.vkdic[kn]
+            if self.bitset.issuperset(vk.bits):
+                cvs, dummy = self.cvs_and_outdic(vk)
+                for cv in cvs:
+                    if cv in cvs_set:
+                        cvs_set.remove(cv)
+                if len(cvs_set) == 0:
+                    break
+        return cvs_set
 
     def tn_grps(self, tnode):
         grps = {}
