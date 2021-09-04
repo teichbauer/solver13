@@ -21,6 +21,10 @@ class TNode:
             sat.update(snode.bgrid.grid_sat(int(val)))
         return sat
 
+    def validate(self):
+        nxtnov = self.holder.nov - 3
+        return Center.filter_vk12(self.vkm.vkdic, nxtnov)
+
     def get_rsats(self, bgrid):
         rsats = []
         sat0 = {}

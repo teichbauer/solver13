@@ -40,14 +40,20 @@ class Center:
                     cls.add_vkm(name, tnode.vkm)
 
     @classmethod
-    def add_paths(cls, pathdic):
-        for key, vkm12 in pathdic.items():
-            name = '-'.join(key)
-            cls.get_vklist(name, vkm12)
-            # dic = cls.pathdic.setdefault(name, {})
-            # dic['all-vk'] = len(vkm12.vkdic)
-            # dic['kn1s'] = vkm12.kn1s
-            # dic['kn2s'] = vkm12.kn2s
+    def filter_vk12(cls, vk, nov):
+        if type(vk).__name__ == 'VKlause':
+            while nov in cls.snodes:
+                sn = cls.snodes[nov]
+                for avk in sn.bgrid.avks:
+                    if vk.hit(avk.dic):
+                        return False
+                nov -= 3
+            return True
+        elif type(vk) == type({}):
+            for v in vk.values():
+                if not cls.filter_vk12(v, nov):
+                    return False
+            return True
 
     @classmethod
     def save_pathdic(cls, filename):

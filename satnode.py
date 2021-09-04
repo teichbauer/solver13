@@ -49,6 +49,7 @@ class SatNode:
                             if vkmx.add_vkdic(ptnode.grps[gv]):
                                 tnname = name0 + ptnode.name
                                 tn = TNode(vkmx, self, tnname)
+                                # r = tn.validate()
                                 dic[tnname] = tn
                                 if self.next:
                                     tn.grps = self.next.bgrid.tn_grps(tn)

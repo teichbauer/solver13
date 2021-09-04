@@ -36,6 +36,15 @@ class BitGrid:
                 return True
         return False
 
+    def reduce_cvs(self, vk12m):
+        """ for every vk in vk12m.vkdic, if vk is totally within grid,
+            """
+        cvs_set = set(self.chheads)
+        kns = vk12m.kn1s + vk12m.kn2s
+        for kn in kns:
+            if self.bitset.issuperset(vk12m.vkdic[kn].bits):
+                pass
+
     def tn_grps(self, tnode):
         grps = {}
         for v in self.chheads:
