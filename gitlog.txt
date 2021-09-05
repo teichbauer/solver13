@@ -1,3 +1,6 @@
+2021-09-04->0.253
+- move bit-grid/tn_grps to tnode/get_grps.
+- snode calling of tn_grps updated
 2021-09-04->0.252
 - progress
 2021-09-03->0.251

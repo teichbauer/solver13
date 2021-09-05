@@ -51,8 +51,7 @@ class SatNode:
                                 tn = TNode(vkmx, self, tnname)
                                 # r = tn.validate()
                                 dic[tnname] = tn
-                                if self.next:
-                                    tn.grps = self.next.bgrid.tn_grps(tn)
+                                tn.get_grps()
                     elif type(ptnode).__name__ == 'dict':
                         for ky, tnd in ptnode.items():
                             if gv in tnd.grps:
@@ -61,15 +60,19 @@ class SatNode:
                                     tnname = name0 + ky
                                     tn = TNode(vkmx, self, tnname)
                                     dic[tnname] = tn
-                                    if self.next:
-                                        tn.grps = self.next.bgrid.tn_grps(tn)
+                                    tn.get_grps()
             else:
                 tnode = TNode(vkm, self, f"{self.nov}.{gv}")
-                if self.next:
-                    tnode.grps = self.next.bgrid.tn_grps(tnode)
+                tnode.get_grps()
 
-                    self.chdic[gv] = tnode
+                self.chdic[gv] = tnode
         Center.add_path_tnodes(self.chdic)
+        if self.nov < 60:
+            print(f"nov: {self.nov}")
+            for chv, tnd in self.chdic.items():
+                ln = len(tnd)
+                print(f"{chv}: {ln}", end="   ")
+            print()
         return self.next.spawn()
 
     def solve(self):

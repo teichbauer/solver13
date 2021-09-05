@@ -1,4 +1,5 @@
 from vk12mgr import VK12Manager
+from vklause import VKlause
 from center import Center
 
 
@@ -11,6 +12,38 @@ class TNode:
         # self.hsat = holder_snode.sh.get_sats(val)
         self.vkm = vk12m
         # self.vkm = VK12Manager(vk12dic)
+
+    def get_grps(self):
+        if not self.holder.next:
+            return
+        bgrid = self.holder.next.bgrid
+        self.grps = {chv: self.vkm.vkdic.copy() for chv in bgrid.chheads}
+        ss = bgrid.bitset.intersection(self.vkm.bdic)
+        if len(ss) == 0:
+            return
+        handled_kns = []  # it can then be jumped over
+        for vk_bit in ss:
+            for kn in self.vkm.bdic[vk_bit]:
+                if kn in handled_kns:
+                    continue
+                else:
+                    handled_kns.append(kn)
+                cvs, odic = bgrid.cvs_and_outdic(self.vkm.vkdic[kn])
+                if (kn in self.vkm.kn1s) or len(odic) == 0:
+                    for v in bgrid.chheads:
+                        if v in self.grps:
+                            if v in cvs:
+                                self.grps.pop(v, None)
+                            else:
+                                self.grps[v].pop(kn, None)
+                else:  # vk2 with 1 bit in 1 bit out of grid
+                    new_vk = VKlause(kn, odic)
+                    for v in bgrid.chheads:
+                        if v in self.grps:
+                            if v in cvs:
+                                self.grps[v][kn] = new_vk
+                            else:
+                                self.grps[v].pop(kn, None)
 
     def get_nsat(self):
         sat = {}
