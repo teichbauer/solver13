@@ -33,13 +33,6 @@ class VK12Manager:
             vk12m.vkdic = self.vkdic.copy()
         return vk12m
 
-    def bset(self):
-        s1 = set([])
-        for b in self.bdic:
-            if len(self.bdic[b]) > 0:
-                s1.add(b)
-        return s1
-
     def vk1s(self):
         return [self.vkdic[kn] for kn in self.kn1s]
 
@@ -189,7 +182,10 @@ class VK12Manager:
             return None
         kn = self.kn1s.pop(0)
         vk = self.vkdic.pop(kn)
-        self.bdic[vk.bits[0]].remove(kn)
+        bit = vk.bits[0]
+        self.bdic[bit].remove(kn)
+        if len(self.bdic[bit]) == 0:
+            self.bdic.pop(bit)
         return vk
 
     def remove_vk2(self, kname):
@@ -197,6 +193,8 @@ class VK12Manager:
         vk = self.vkdic.pop(kname)
         for b in vk.bits:
             self.bdic[b].remove(kname)
+            if len(self.bdic[b]) == 0:
+                self.bdic.pop(b)
         return vk
 
     def pick_bvk(self):

@@ -7,8 +7,6 @@ from center import Center
 
 
 class SatNode:
-    debug = False
-    # debug = True
 
     def __init__(self, parent, sh, vkm, choice):
         self.parent = parent
@@ -25,13 +23,49 @@ class SatNode:
         self.bgrid = BitGrid(choice)
         self.split_vkm()
 
+    def split_vkm(self):
+        """ 1. pop-out touched-vk3s forming vk12dic with them
+            2. tdic: keyed by cvs of vks and values are lists of vks
+               this results in self.vk2grps dict, keyed by the possible 
+               grid-values(bgrid/chheads), vkdics restricting the value
+               if vk2grps misses a chhead-value, that doesn't mean, this value
+               if not allowed - quite the opposite: This means that there is no
+               restriction(restrictive vk2) on this ch-head/value.
+            3. make next-choice from vkm - if not empty, if it is empty,no .next
+            """
+        Center.satbits.update(self.bgrid.bitset)
+        Center.bits = Center.bits - self.bgrid.bitset
+
+        self.vk12dic = {}
+        tdic = {}
+        for kn in self.touched:
+            vk = self.vkm.pop_vk(kn)
+            cvs, outdic = self.bgrid.cvs_and_outdic(vk)
+            rvk = VKlause(vk.kname, outdic)
+            for v in cvs:
+                if v not in self.bgrid.covers:
+                    s = tdic.setdefault(v, set([]))
+                    s.add(rvk)
+                if kn not in self.vk12dic:
+                    self.vk12dic[kn] = rvk
+        self.vk2grps = {}
+        for v in self.bgrid.chheads:
+            if v in tdic:
+                d = self.vk2grps.setdefault(v, {})
+                for vk2 in tdic[v]:
+                    d[vk2.kname] = vk2
+
+        if len(self.vkm.vkdic) > 0:
+            self.next = SatNode(self,
+                                self.next_sh.clone(),
+                                self.vkm,
+                                self.vkm.make_choice())
+    # ---- def split_vkm(self) --------
+
     def spawn(self):
         self.chdic = {}
         if not self.next:
             return self.solve()
-
-        Center.satbits.update(self.bgrid.bitset)
-        Center.bits = Center.bits - self.bgrid.bitset
 
         # for gv in self.vk2grps:
         for gv in self.bgrid.chheads:
@@ -83,39 +117,3 @@ class SatNode:
                 tn.get_sats(self.bgrid)
         # Center.save_pathdic('path-fino1.json')
         return Center.sats
-
-    def split_vkm(self):
-        """ 1. pop-out touched-vk3s forming vk12dic with them
-            2. tdic: keyed by cvs of vks and values are lists of vks
-               this results in self.vk2grps dict, keyed by the possible 
-               grid-values(bgrid/chheads), vkdics restricting the value
-               if vk2grps misses a chhead-value, that doesn't mean, this value
-               if not allowed - quite the opposite: This means that there is no
-               restriction(restrictive vk2) on this ch-head/value.
-            3. make next-choice from vkm - if not empty, if it is empty,no .next
-            """
-        self.vk12dic = {}
-        tdic = {}
-        for kn in self.touched:
-            vk = self.vkm.pop_vk(kn)
-            cvs, outdic = self.bgrid.cvs_and_outdic(vk)
-            rvk = VKlause(vk.kname, outdic)
-            for v in cvs:
-                if v not in self.bgrid.covers:
-                    s = tdic.setdefault(v, set([]))
-                    s.add(rvk)
-                if kn not in self.vk12dic:
-                    self.vk12dic[kn] = rvk
-        self.vk2grps = {}
-        for v in self.bgrid.chheads:
-            if v in tdic:
-                d = self.vk2grps.setdefault(v, {})
-                for vk2 in tdic[v]:
-                    d[vk2.kname] = vk2
-
-        if len(self.vkm.vkdic) > 0:
-            self.next = SatNode(self,
-                                self.next_sh.clone(),
-                                self.vkm,
-                                self.vkm.make_choice())
-    # ---- def split_vkm(self) --------
